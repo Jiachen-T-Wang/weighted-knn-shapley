@@ -1605,22 +1605,21 @@ def fastweighted_knn_shapley_single(x_train_few, y_train_few, x_test, y_test, K,
           wm = weight_disc[m]
           ind_m = val_ind_map[wm]
           Fi[m, 1, ind_m] = 1
-      
+
+      check_vals = np.round(all_possible-wi, n_digit)
+      valid_indices = np.logical_and(check_vals >= weight_min_disc, check_vals <= weight_max_disc)
+      invalid_indices = ~valid_indices
+      mapped_inds = np.array([val_ind_map[val] for val in check_vals[valid_indices]])
+
       # For 2 <= l <= K-1
       for l in range(2, K):
-        for m in range(l-1, N):
-          check_vals = np.round(all_possible-wi, n_digit)
-          for j, s in enumerate(all_possible):
-            if i < m:
-              # check_val = np.round(s-wi, n_digit)
-              check_val = check_vals[j]
-              if check_val < weight_min_disc or check_val > weight_max_disc:
-                Fi[m, l, j] = F[m, l, j]
-              else:
-                ind_sm = val_ind_map[check_val]
-                Fi[m, l, j] = F[m, l, j] - Fi[m, l-1, ind_sm]
-            elif i > m:
-              Fi[m, l, j] = F[m, l, j]
+        Fi[l-1:i, l, :] = F[l-1:i, l, :]
+
+      for l in range(2, K):
+        Fi[max(l-1, i+1):N, l, valid_indices] = F[max(l-1, i+1):N, l, valid_indices] - Fi[max(l-1, i+1):N, l-1, mapped_inds]
+        Fi[max(l-1, i+1):N, l, invalid_indices] = F[max(l-1, i+1):N, l, invalid_indices]
+        
+      print('i={}, small_loop={}'.format(i, time.time()-t_Fi_start))
 
       t_Ei_s = time.time()
 
@@ -1640,10 +1639,6 @@ def fastweighted_knn_shapley_single(x_train_few, y_train_few, x_test, y_test, K,
       print('l_star = {}'.format(l_star))
 
       t_bigloop_s = time.time()
-
-      # For K <= l <= N-1
-      # for l in range(K, l_star):
-      #   for m in range( max(i+1, K-1), N ):
 
       for m in range( max(i+1, K-1), N ):
         wm = weight_disc[m]
@@ -1670,18 +1665,13 @@ def fastweighted_knn_shapley_single(x_train_few, y_train_few, x_test, y_test, K,
         start_val, end_val = 0, -wi-interval
         start_ind, end_ind = val_ind_map[round(start_val, n_digit)], val_ind_map[round(end_val, n_digit)]
 
-      for l in range(1, K):
-        for m in range(N):
-          if i != m:
-            for ind in range(start_ind, end_ind+1):
-              Gi[l] += Fi[m, l, ind]
+      for m in range(N):
+        if i != m:
+          Gi[1:K] += np.sum(Fi[m, 1:K, start_ind:end_ind+1], axis=1)
 
-      for l in range(K, N):
-        for m in range(N):
-          if i != m:
-            
+      for m in range(N):
+        if i != m:
             wm = weight_disc[m]
-
             start_ind, end_ind = 0, -1
             if wi > 0 and wm < wi: 
               start_val, end_val = -wi, -wm-interval
@@ -1690,7 +1680,7 @@ def fastweighted_knn_shapley_single(x_train_few, y_train_few, x_test, y_test, K,
               start_val, end_val = -wm, -wi-interval
               start_ind, end_ind = val_ind_map[round(start_val, n_digit)], val_ind_map[round(end_val, n_digit)]
 
-            Gi[l] += np.sum(Fi[m, l, start_ind:end_ind+1])
+        Gi[K:N] += np.sum(Fi[m, K:N, start_ind:end_ind+1], axis=1)
 
       Gi_l = Gi[1:]/I[1:]
 
