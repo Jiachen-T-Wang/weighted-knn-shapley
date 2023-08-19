@@ -1549,32 +1549,12 @@ def fastweighted_knn_shapley_single(x_train_few, y_train_few, x_test, y_test, K,
       check_vals = np.round(all_possible - wm, n_digit)
 
       for j, s in enumerate(all_possible):
-        # wm = weight_disc[m]
-        # check_val = np.round(s-wm, n_digit)
         check_val = check_vals[j]
         if check_val < weight_min_disc or check_val > weight_max_disc:
           F[m, l, j] = 0
         else:
           ind_sm = val_ind_map[check_val]
           F[m, l, j] += np.sum(F[:m, l-1, ind_sm])
-          # for t in range(m):
-          #   F[m, l, j] += F[t, l-1, ind_sm]
-
-  # For K <= l <= N
-  """
-  for l in range(K, N+1):
-    for m in range(K-1, N):
-      for j, s in enumerate(all_possible):
-        for t in range(m):
-          F[m, l, j] += F[t, K-1, j] * comb(N-1-m, l-K)
-  """
-
-  """
-  H = np.zeros((N+1, N))
-  for l in range(K, N+1):
-    for m in range(K-1, N):
-      H[l, m] = comb(N-1-m, l-K)
-  """
 
   l_values, m_values = np.ogrid[K:N+1, K-1:N]
   H = np.zeros((N+1, N))
@@ -1616,6 +1596,8 @@ def fastweighted_knn_shapley_single(x_train_few, y_train_few, x_test, y_test, K,
 
       # set size+1 for each entry for convenience
       Fi = np.zeros((N, N, V))
+
+      t_Fi_start = time.time()
 
       # Initialize for l=1
       for m in range(0, N):
@@ -1660,52 +1642,39 @@ def fastweighted_knn_shapley_single(x_train_few, y_train_few, x_test, y_test, K,
       t_bigloop_s = time.time()
 
       # For K <= l <= N-1
-      for l in range(K, l_star):
-        for m in range( max(i+1, K-1), N ):
+      # for l in range(K, l_star):
+      #   for m in range( max(i+1, K-1), N ):
 
-          wm = weight_disc[m]
-          check_vals = np.round(all_possible-wi+wm, n_digit)
+      for m in range( max(i+1, K-1), N ):
+        wm = weight_disc[m]
+        check_vals = np.round(all_possible-wi+wm, n_digit)
+        valid_indices = np.logical_and(check_vals >= weight_min_disc, check_vals <= weight_max_disc)
+        mapped_inds = np.array([val_ind_map[val] for val in check_vals[valid_indices]])
+        H_reshaped = H[K:l_star, m][:, np.newaxis]  # (l_star - K, 1)
+        updates = Fi[m, K - 1, mapped_inds] * H_reshaped  # (l_star - K, len(mapped_inds))
+        Fi[m, K:l_star, valid_indices] = F[m, K:l_star, valid_indices] - updates.T
+        Fi[m, K:l_star, ~valid_indices] = F[m, K:l_star, ~valid_indices]
 
-          for j, s in enumerate(all_possible):
-            # wm = weight_disc[m]
-            # check_val = np.round(s-wi+wm, n_digit)
-            check_val = check_vals[j]
-            if check_val < weight_min_disc or check_val > weight_max_disc:
-              Fi[m, l, j] = F[m, l, j]
-            else:
-              ind_sm = val_ind_map[check_val]
-              Fi[m, l, j] = F[m, l, j] - Fi[m, K-1, ind_sm] * H[l, m] # comb(N-1-m, l-K)
-
+      print('i={}, bigloop={}'.format(i, time.time()-t_Fi_start))
       t_bigloop += (time.time() - t_bigloop_s)
 
       Gi = np.zeros(N)
 
       t_Gi = time.time()
 
-      """
-      if wi > 0:
-        check_range = np.round(np.linspace(-wi, -interval, int(np.round(wi/interval))), n_digit)
+      start_ind, end_ind = 0, -1
+      if wi > 0: 
+        start_val, end_val = -wi, -interval
+        start_ind, end_ind = val_ind_map[round(start_val, n_digit)], val_ind_map[round(end_val, n_digit)]
       elif wi < 0:
-        check_range = np.round(np.linspace(0, -wi-interval, int(np.round(-wi/interval))), n_digit)
-      else:
-        check_range = []
-      """
-
-      end_val = -wi - interval if wi < 0 else -interval
-      start_val = 0 if wi < 0 else -wi
-      num_points = int(np.round(abs(wi) / interval))
-      check_range = np.round(np.linspace(start_val, end_val, num_points), n_digit) if wi != 0 else []
+        start_val, end_val = 0, -wi-interval
+        start_ind, end_ind = val_ind_map[round(start_val, n_digit)], val_ind_map[round(end_val, n_digit)]
 
       for l in range(1, K):
         for m in range(N):
           if i != m:
-            for s in check_range:
-              if s not in val_ind_map:
-                pass
-              else:
-                ind = val_ind_map[s]
-                Gi[l] += Fi[m, l, ind]
-
+            for ind in range(start_ind, end_ind+1):
+              Gi[l] += Fi[m, l, ind]
 
       for l in range(K, N):
         for m in range(N):
@@ -1720,33 +1689,12 @@ def fastweighted_knn_shapley_single(x_train_few, y_train_few, x_test, y_test, K,
             elif wi < 0 and wm > wi:
               start_val, end_val = -wm, -wi-interval
               start_ind, end_ind = val_ind_map[round(start_val, n_digit)], val_ind_map[round(end_val, n_digit)]
-              
-            for ind in range(start_ind, end_ind+1):
-              Gi[l] += Fi[m, l, ind]
 
-            """
-            if wi > 0 and wm < wi:
-              check_range = np.round(np.linspace(-wi, -wm-interval, int(np.round((wi-wm)/interval))), n_digit)
-            elif wi < 0 and wm > wi:
-              check_range = np.round(np.linspace(-wm, -wi-interval, int(np.round((wm-wi)/interval))), n_digit)
-            else:
-              check_range = []
+            Gi[l] += np.sum(Fi[m, l, start_ind:end_ind+1])
 
-            for s in check_range:
-              if s not in val_ind_map:
-                pass
-              else:
-                ind = val_ind_map[s]
-                Gi[l] += Fi[m, l, ind]
-            """
-                
-      # Gi_l = [ Gi[l]/comb(N-1, l) for l in range(1, N) ]
-      # Gi_l = [ Gi[l]/I[l] for l in range(1, N) ]
       Gi_l = Gi[1:]/I[1:]
 
       t_computeGi += (time.time() - t_Gi)
-
-      # print('i={}, Gi={}'.format(i, np.round(Gi_l, 3)))
 
       sv[i] = np.sum(Gi_l)
       if wi < 0:
