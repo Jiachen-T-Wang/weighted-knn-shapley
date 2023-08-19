@@ -1,0 +1,529 @@
+-------
+Load Dataset fraud
+Average Norm of Data Point 16783.418699138085
+# of classes = 2
+-------
+Data Error Type: Mislabel
+-------
+[1 1 1 1 1 0 0 1 0 0 0 0 1 1 1 0 1 1 0 1]
+gamma=0, acc=0.9
+gamma=0.01, acc=0.9
+gamma=0.02, acc=0.9
+gamma=0.05, acc=0.9
+gamma=0.1, acc=0.9
+gamma=0.5, acc=0.9
+gamma=1, acc=0.9
+gamma=2, acc=0.9
+gamma=3, acc=0.9
+gamma=4, acc=0.9
+gamma=5, acc=0.9
+gamma=6, acc=0.9
+gamma=7, acc=0.8
+gamma=8, acc=0.8
+gamma=9, acc=0.7
+gamma=10, acc=0.7
+acc_TNN=0.8399999999999999
+weight=[-0.70722259 -0.7100928  -0.         -0.45751786 -0.28576369  0.58220404
+  0.84070009 -0.05539052  0.71538841  1.          0.54272201  0.51590496
+ -0.12908204 -0.50044145 -0.7859462   0.74415534 -0.08756504 -0.77955696
+  0.64829712 -0.08325611]
+weight_max_disc 3.8
+weight_min_disc -3.5
+all_possible [-3.5000000e+00 -3.4000000e+00 -3.3000000e+00 -3.2000000e+00
+ -3.1000000e+00 -3.0000000e+00 -2.9000000e+00 -2.8000000e+00
+ -2.7000000e+00 -2.6000000e+00 -2.5000000e+00 -2.4000000e+00
+ -2.3000000e+00 -2.2000000e+00 -2.1000000e+00 -2.0000000e+00
+ -1.9000000e+00 -1.8000000e+00 -1.7000000e+00 -1.6000000e+00
+ -1.5000000e+00 -1.4000000e+00 -1.3000000e+00 -1.2000000e+00
+ -1.1000000e+00 -1.0000000e+00 -9.0000000e-01 -8.0000000e-01
+ -7.0000000e-01 -6.0000000e-01 -5.0000000e-01 -4.0000000e-01
+ -3.0000000e-01 -2.0000000e-01 -1.0000000e-01 -4.4408921e-16
+  1.0000000e-01  2.0000000e-01  3.0000000e-01  4.0000000e-01
+  5.0000000e-01  6.0000000e-01  7.0000000e-01  8.0000000e-01
+  9.0000000e-01  1.0000000e+00  1.1000000e+00  1.2000000e+00
+  1.3000000e+00  1.4000000e+00  1.5000000e+00  1.6000000e+00
+  1.7000000e+00  1.8000000e+00  1.9000000e+00  2.0000000e+00
+  2.1000000e+00  2.2000000e+00  2.3000000e+00  2.4000000e+00
+  2.5000000e+00  2.6000000e+00  2.7000000e+00  2.8000000e+00
+  2.9000000e+00  3.0000000e+00  3.1000000e+00  3.2000000e+00
+  3.3000000e+00  3.4000000e+00  3.5000000e+00  3.6000000e+00
+  3.7000000e+00  3.8000000e+00]
+index of zero: 35, value check = -4.440892098500626e-16
+Now compute 0th Shapley value
+Now compute 1th Shapley value
+Now compute 2th Shapley value
+*** Reuse Shapley Value ***
+Now compute 3th Shapley value
+Now compute 4th Shapley value
+Now compute 5th Shapley value
+Now compute 6th Shapley value
+Now compute 7th Shapley value
+Now compute 8th Shapley value
+Now compute 9th Shapley value
+Now compute 10th Shapley value
+Now compute 11th Shapley value
+Now compute 12th Shapley value
+Now compute 13th Shapley value
+Now compute 14th Shapley value
+Now compute 15th Shapley value
+Now compute 16th Shapley value
+Now compute 17th Shapley value
+Now compute 18th Shapley value
+Now compute 19th Shapley value
+weight_disc [-0.7 -0.7 -0.  -0.5 -0.3  0.6  0.8 -0.1  0.7  1.   0.5  0.5 -0.1 -0.5
+ -0.8  0.7 -0.1 -0.8  0.6 -0.1]
+[-3.70219607 -3.70219607  0.         -2.36403303 -1.4265626   2.93584778
+  4.31580038 -0.58541897  3.45921373  4.9339405   2.009912    2.009912
+ -0.34567969 -1.28939997 -2.14398562  1.90105345 -0.30238965 -1.73730896
+  1.3183326  -0.2754558 ]
+[-1 -1 -1 -1 -1  1  1 -1  1  1  1  1 -1 -1 -1  1 -1 -1  1 -1]
+[-3.70219607 -3.70219607  0.         -2.36403303 -1.4265626   2.93584778
+  4.31580038 -0.58541897  3.45921373  4.9339405   2.009912    2.009912
+ -0.34567969 -1.28939997 -2.14398562  1.90105345 -0.30238965 -1.73730896
+  1.3183326  -0.2754558 ]
+weight=[ 0.3269641   0.6027733   0.68670927  0.19635954  0.41730982 -0.2398941
+ -0.          0.56409818 -0.2911263  -0.45909338 -0.25073424 -0.02200993
+  0.35822718  1.          0.54658119 -0.3022636   0.50152085  0.36337053
+ -0.33420275  0.43033866]
+weight_max_disc 3.4
+weight_min_disc -1.7
+all_possible [-1.7 -1.6 -1.5 -1.4 -1.3 -1.2 -1.1 -1.  -0.9 -0.8 -0.7 -0.6 -0.5 -0.4
+ -0.3 -0.2 -0.1  0.   0.1  0.2  0.3  0.4  0.5  0.6  0.7  0.8  0.9  1.
+  1.1  1.2  1.3  1.4  1.5  1.6  1.7  1.8  1.9  2.   2.1  2.2  2.3  2.4
+  2.5  2.6  2.7  2.8  2.9  3.   3.1  3.2  3.3  3.4]
+index of zero: 17, value check = 0.0
+Now compute 0th Shapley value
+Now compute 1th Shapley value
+Now compute 2th Shapley value
+Now compute 3th Shapley value
+Now compute 4th Shapley value
+Now compute 5th Shapley value
+Now compute 6th Shapley value
+*** Reuse Shapley Value ***
+Now compute 7th Shapley value
+Now compute 8th Shapley value
+Now compute 9th Shapley value
+Now compute 10th Shapley value
+Now compute 11th Shapley value
+*** Reuse Shapley Value ***
+Now compute 12th Shapley value
+Now compute 13th Shapley value
+Now compute 14th Shapley value
+Now compute 15th Shapley value
+Now compute 16th Shapley value
+Now compute 17th Shapley value
+Now compute 18th Shapley value
+Now compute 19th Shapley value
+weight_disc [ 0.3  0.6  0.7  0.2  0.4 -0.2 -0.   0.6 -0.3 -0.5 -0.3 -0.   0.4  1.
+  0.5 -0.3  0.5  0.4 -0.3  0.4]
+[ 1.38900006  2.56710343  2.71382513  0.84736712  1.57611085 -1.09279317
+  0.          2.56710343 -1.44434393 -3.05525486 -1.44434393  0.
+  0.95574936  1.61520497  1.19085687 -0.88564824  1.09029077  0.86850327
+ -0.79189395  0.81140351]
+[ 1  1  1  1  1 -1 -1  1 -1 -1 -1 -1  1  1  1 -1  1  1 -1  1]
+[ 1.38900006  2.56710343  2.71382513  0.84736712  1.57611085 -1.09279317
+  0.          2.56710343 -1.44434393 -3.05525486 -1.44434393  0.
+  0.95574936  1.61520497  1.19085687 -0.88564824  1.09029077  0.86850327
+ -0.79189395  0.81140351]
+weight=[-0.71086752 -0.87146071 -0.19912358 -0.30627075 -0.08762086  0.62087484
+  0.57714192 -0.02538848  1.          0.62498649  0.60567311  0.61308003
+ -0.24865032 -0.27806039 -0.24435506  0.74403999 -0.         -0.81716898
+  0.95520208 -0.06299184]
+weight_max_disc 3.9
+weight_min_disc -3.0
+all_possible [-3.  -2.9 -2.8 -2.7 -2.6 -2.5 -2.4 -2.3 -2.2 -2.1 -2.  -1.9 -1.8 -1.7
+ -1.6 -1.5 -1.4 -1.3 -1.2 -1.1 -1.  -0.9 -0.8 -0.7 -0.6 -0.5 -0.4 -0.3
+ -0.2 -0.1  0.   0.1  0.2  0.3  0.4  0.5  0.6  0.7  0.8  0.9  1.   1.1
+  1.2  1.3  1.4  1.5  1.6  1.7  1.8  1.9  2.   2.1  2.2  2.3  2.4  2.5
+  2.6  2.7  2.8  2.9  3.   3.1  3.2  3.3  3.4  3.5  3.6  3.7  3.8  3.9]
+index of zero: 30, value check = 0.0
+Now compute 0th Shapley value
+Now compute 1th Shapley value
+Now compute 2th Shapley value
+Now compute 3th Shapley value
+Now compute 4th Shapley value
+Now compute 5th Shapley value
+Now compute 6th Shapley value
+Now compute 7th Shapley value
+*** Reuse Shapley Value ***
+Now compute 8th Shapley value
+Now compute 9th Shapley value
+Now compute 10th Shapley value
+Now compute 11th Shapley value
+Now compute 12th Shapley value
+Now compute 13th Shapley value
+Now compute 14th Shapley value
+Now compute 15th Shapley value
+Now compute 16th Shapley value
+*** Reuse Shapley Value ***
+Now compute 17th Shapley value
+Now compute 18th Shapley value
+Now compute 19th Shapley value
+weight_disc [-0.7 -0.9 -0.2 -0.3 -0.1  0.6  0.6 -0.   1.   0.6  0.6  0.6 -0.2 -0.3
+ -0.2  0.7 -0.  -0.8  1.  -0.1]
+[-4.09108401 -5.55424177 -1.21580389 -1.93352425 -0.86666584  2.31746006
+  2.31746006  0.          4.76633609  2.28797458  2.28797458  2.28797458
+ -0.57480213 -0.96657582 -0.57480213  1.72603429  0.         -1.76350662
+  1.81339378 -0.26719986]
+[-1 -1 -1 -1 -1  1  1 -1  1  1  1  1 -1 -1 -1  1 -1 -1  1 -1]
+[-4.09108401 -5.55424177 -1.21580389 -1.93352425 -0.86666584  2.31746006
+  2.31746006  0.          4.76633609  2.28797458  2.28797458  2.28797458
+ -0.57480213 -0.96657582 -0.57480213  1.72603429  0.         -1.76350662
+  1.81339378 -0.26719986]
+weight=[-0.74916185 -0.79433228 -0.26533072 -0.39023643 -0.14618662  0.72032617
+  0.65102309 -0.04034263  0.85803083  0.56295139  0.65366347  0.5932777
+ -0.19218197 -0.24192401 -0.30919205  0.57669932 -0.         -1.
+  0.88919077 -0.10756151]
+weight_max_disc 3.9
+weight_min_disc -3.2
+all_possible [-3.2000000e+00 -3.1000000e+00 -3.0000000e+00 -2.9000000e+00
+ -2.8000000e+00 -2.7000000e+00 -2.6000000e+00 -2.5000000e+00
+ -2.4000000e+00 -2.3000000e+00 -2.2000000e+00 -2.1000000e+00
+ -2.0000000e+00 -1.9000000e+00 -1.8000000e+00 -1.7000000e+00
+ -1.6000000e+00 -1.5000000e+00 -1.4000000e+00 -1.3000000e+00
+ -1.2000000e+00 -1.1000000e+00 -1.0000000e+00 -9.0000000e-01
+ -8.0000000e-01 -7.0000000e-01 -6.0000000e-01 -5.0000000e-01
+ -4.0000000e-01 -3.0000000e-01 -2.0000000e-01 -1.0000000e-01
+ -4.4408921e-16  1.0000000e-01  2.0000000e-01  3.0000000e-01
+  4.0000000e-01  5.0000000e-01  6.0000000e-01  7.0000000e-01
+  8.0000000e-01  9.0000000e-01  1.0000000e+00  1.1000000e+00
+  1.2000000e+00  1.3000000e+00  1.4000000e+00  1.5000000e+00
+  1.6000000e+00  1.7000000e+00  1.8000000e+00  1.9000000e+00
+  2.0000000e+00  2.1000000e+00  2.2000000e+00  2.3000000e+00
+  2.4000000e+00  2.5000000e+00  2.6000000e+00  2.7000000e+00
+  2.8000000e+00  2.9000000e+00  3.0000000e+00  3.1000000e+00
+  3.2000000e+00  3.3000000e+00  3.4000000e+00  3.5000000e+00
+  3.6000000e+00  3.7000000e+00  3.8000000e+00  3.9000000e+00]
+index of zero: 32, value check = -4.440892098500626e-16
+Now compute 0th Shapley value
+Now compute 1th Shapley value
+Now compute 2th Shapley value
+Now compute 3th Shapley value
+Now compute 4th Shapley value
+Now compute 5th Shapley value
+Now compute 6th Shapley value
+Now compute 7th Shapley value
+*** Reuse Shapley Value ***
+Now compute 8th Shapley value
+Now compute 9th Shapley value
+Now compute 10th Shapley value
+Now compute 11th Shapley value
+Now compute 12th Shapley value
+Now compute 13th Shapley value
+Now compute 14th Shapley value
+Now compute 15th Shapley value
+Now compute 16th Shapley value
+*** Reuse Shapley Value ***
+Now compute 17th Shapley value
+Now compute 18th Shapley value
+Now compute 19th Shapley value
+weight_disc [-0.7 -0.8 -0.3 -0.4 -0.1  0.7  0.7 -0.   0.9  0.6  0.7  0.6 -0.2 -0.2
+ -0.3  0.6 -0.  -1.   0.9 -0.1]
+[-3.87416763 -4.4127442  -1.40335705 -2.16649286 -0.54501055  3.31057367
+  3.31057367  0.          4.44465803  2.28247209  3.02840142  2.28247209
+ -0.57685134 -0.57685134 -0.75929944  1.59066389  0.         -2.1350983
+  1.69833898 -0.26470588]
+[-1 -1 -1 -1 -1  1  1 -1  1  1  1  1 -1 -1 -1  1 -1 -1  1 -1]
+[-3.87416763 -4.4127442  -1.40335705 -2.16649286 -0.54501055  3.31057367
+  3.31057367  0.          4.44465803  2.28247209  3.02840142  2.28247209
+ -0.57685134 -0.57685134 -0.75929944  1.59066389  0.         -2.1350983
+  1.69833898 -0.26470588]
+weight=[ 0.08459551  0.39671673  0.85496088  0.43035141  0.98503453 -0.21041657
+ -0.2515079   0.90289662 -0.18797765 -0.49587702 -0.25972861 -0.
+  0.67318409  1.          0.81701827 -0.39022128  0.84959504  0.19650055
+ -0.15689163  0.66881887]
+weight_max_disc 4.6
+weight_min_disc -1.7
+all_possible [-1.7 -1.6 -1.5 -1.4 -1.3 -1.2 -1.1 -1.  -0.9 -0.8 -0.7 -0.6 -0.5 -0.4
+ -0.3 -0.2 -0.1  0.   0.1  0.2  0.3  0.4  0.5  0.6  0.7  0.8  0.9  1.
+  1.1  1.2  1.3  1.4  1.5  1.6  1.7  1.8  1.9  2.   2.1  2.2  2.3  2.4
+  2.5  2.6  2.7  2.8  2.9  3.   3.1  3.2  3.3  3.4  3.5  3.6  3.7  3.8
+  3.9  4.   4.1  4.2  4.3  4.4  4.5  4.6]
+index of zero: 17, value check = 0.0
+Now compute 0th Shapley value
+Now compute 1th Shapley value
+Now compute 2th Shapley value
+Now compute 3th Shapley value
+Now compute 4th Shapley value
+Now compute 5th Shapley value
+Now compute 6th Shapley value
+Now compute 7th Shapley value
+Now compute 8th Shapley value
+Now compute 9th Shapley value
+Now compute 10th Shapley value
+Now compute 11th Shapley value
+*** Reuse Shapley Value ***
+Now compute 12th Shapley value
+Now compute 13th Shapley value
+Now compute 14th Shapley value
+Now compute 15th Shapley value
+Now compute 16th Shapley value
+Now compute 17th Shapley value
+Now compute 18th Shapley value
+Now compute 19th Shapley value
+weight_disc [ 0.1  0.4  0.9  0.4  1.  -0.2 -0.3  0.9 -0.2 -0.5 -0.3 -0.   0.7  1.
+  0.8 -0.4  0.8  0.2 -0.2  0.7]
+[ 0.43728056  1.27760251  2.48372611  1.27760251  2.56549161 -0.77315675
+ -1.05862627  2.48372611 -0.77315675 -1.95532469 -1.05862627  0.
+  1.13604052  1.41859216  1.22323334 -0.86493769  1.12533124  0.43503083
+ -0.42615116  0.94470244]
+[ 1  1  1  1  1 -1 -1  1 -1 -1 -1 -1  1  1  1 -1  1  1 -1  1]
+[ 0.43728056  1.27760251  2.48372611  1.27760251  2.56549161 -0.77315675
+ -1.05862627  2.48372611 -0.77315675 -1.95532469 -1.05862627  0.
+  1.13604052  1.41859216  1.22323334 -0.86493769  1.12533124  0.43503083
+ -0.42615116  0.94470244]
+weight=[-0.8934616  -0.67216242 -0.09175489 -0.64740956 -0.35068949  0.98922995
+  0.97951627 -0.          0.82650637  1.          0.97873357  0.84095052
+ -0.20046191 -0.29255016 -0.79028203  0.73193337 -0.06417176 -0.98122708
+  0.78526738 -0.0595362 ]
+weight_max_disc 4.8
+weight_min_disc -4.0
+all_possible [-4.  -3.9 -3.8 -3.7 -3.6 -3.5 -3.4 -3.3 -3.2 -3.1 -3.  -2.9 -2.8 -2.7
+ -2.6 -2.5 -2.4 -2.3 -2.2 -2.1 -2.  -1.9 -1.8 -1.7 -1.6 -1.5 -1.4 -1.3
+ -1.2 -1.1 -1.  -0.9 -0.8 -0.7 -0.6 -0.5 -0.4 -0.3 -0.2 -0.1  0.   0.1
+  0.2  0.3  0.4  0.5  0.6  0.7  0.8  0.9  1.   1.1  1.2  1.3  1.4  1.5
+  1.6  1.7  1.8  1.9  2.   2.1  2.2  2.3  2.4  2.5  2.6  2.7  2.8  2.9
+  3.   3.1  3.2  3.3  3.4  3.5  3.6  3.7  3.8  3.9  4.   4.1  4.2  4.3
+  4.4  4.5  4.6  4.7  4.8]
+index of zero: 40, value check = 0.0
+Now compute 0th Shapley value
+Now compute 1th Shapley value
+Now compute 2th Shapley value
+Now compute 3th Shapley value
+Now compute 4th Shapley value
+Now compute 5th Shapley value
+Now compute 6th Shapley value
+Now compute 7th Shapley value
+*** Reuse Shapley Value ***
+Now compute 8th Shapley value
+Now compute 9th Shapley value
+Now compute 10th Shapley value
+Now compute 11th Shapley value
+Now compute 12th Shapley value
+Now compute 13th Shapley value
+Now compute 14th Shapley value
+Now compute 15th Shapley value
+Now compute 16th Shapley value
+Now compute 17th Shapley value
+Now compute 18th Shapley value
+Now compute 19th Shapley value
+weight_disc [-0.9 -0.7 -0.1 -0.6 -0.4  1.   1.  -0.   0.8  1.   1.   0.8 -0.2 -0.3
+ -0.8  0.7 -0.1 -1.   0.8 -0.1]
+[-3.56438367 -2.64297545 -0.39685358 -1.82575672 -1.47814801  3.53541282
+  3.53541282  0.          2.4780499   3.4014807   3.4014807   2.4780499
+ -0.50890166 -0.6691335  -1.68379118  1.49785715 -0.29486045 -1.90393688
+  1.40574475 -0.27313381]
+[-1 -1 -1 -1 -1  1  1 -1  1  1  1  1 -1 -1 -1  1 -1 -1  1 -1]
+[-3.56438367 -2.64297545 -0.39685358 -1.82575672 -1.47814801  3.53541282
+  3.53541282  0.          2.4780499   3.4014807   3.4014807   2.4780499
+ -0.50890166 -0.6691335  -1.68379118  1.49785715 -0.29486045 -1.90393688
+  1.40574475 -0.27313381]
+weight=[-0.5417335  -0.92284267 -0.33846932 -0.53089367 -0.10963291  0.85409606
+  0.61195306 -0.          0.94312686  1.          0.80786124  0.56631965
+ -0.15052768 -0.36760673 -0.48715144  0.44315332 -0.18011244 -0.98106885
+  0.95388319 -0.12535581]
+weight_max_disc 4.6
+weight_min_disc -3.4
+all_possible [-3.4000000e+00 -3.3000000e+00 -3.2000000e+00 -3.1000000e+00
+ -3.0000000e+00 -2.9000000e+00 -2.8000000e+00 -2.7000000e+00
+ -2.6000000e+00 -2.5000000e+00 -2.4000000e+00 -2.3000000e+00
+ -2.2000000e+00 -2.1000000e+00 -2.0000000e+00 -1.9000000e+00
+ -1.8000000e+00 -1.7000000e+00 -1.6000000e+00 -1.5000000e+00
+ -1.4000000e+00 -1.3000000e+00 -1.2000000e+00 -1.1000000e+00
+ -1.0000000e+00 -9.0000000e-01 -8.0000000e-01 -7.0000000e-01
+ -6.0000000e-01 -5.0000000e-01 -4.0000000e-01 -3.0000000e-01
+ -2.0000000e-01 -1.0000000e-01  4.4408921e-16  1.0000000e-01
+  2.0000000e-01  3.0000000e-01  4.0000000e-01  5.0000000e-01
+  6.0000000e-01  7.0000000e-01  8.0000000e-01  9.0000000e-01
+  1.0000000e+00  1.1000000e+00  1.2000000e+00  1.3000000e+00
+  1.4000000e+00  1.5000000e+00  1.6000000e+00  1.7000000e+00
+  1.8000000e+00  1.9000000e+00  2.0000000e+00  2.1000000e+00
+  2.2000000e+00  2.3000000e+00  2.4000000e+00  2.5000000e+00
+  2.6000000e+00  2.7000000e+00  2.8000000e+00  2.9000000e+00
+  3.0000000e+00  3.1000000e+00  3.2000000e+00  3.3000000e+00
+  3.4000000e+00  3.5000000e+00  3.6000000e+00  3.7000000e+00
+  3.8000000e+00  3.9000000e+00  4.0000000e+00  4.1000000e+00
+  4.2000000e+00  4.3000000e+00  4.4000000e+00  4.5000000e+00
+  4.6000000e+00]
+index of zero: 34, value check = 4.440892098500626e-16
+Now compute 0th Shapley value
+Now compute 1th Shapley value
+Now compute 2th Shapley value
+Now compute 3th Shapley value
+Now compute 4th Shapley value
+Now compute 5th Shapley value
+Now compute 6th Shapley value
+Now compute 7th Shapley value
+*** Reuse Shapley Value ***
+Now compute 8th Shapley value
+Now compute 9th Shapley value
+Now compute 10th Shapley value
+Now compute 11th Shapley value
+Now compute 12th Shapley value
+Now compute 13th Shapley value
+Now compute 14th Shapley value
+Now compute 15th Shapley value
+Now compute 16th Shapley value
+Now compute 17th Shapley value
+Now compute 18th Shapley value
+Now compute 19th Shapley value
+weight_disc [-0.5 -0.9 -0.3 -0.5 -0.1  0.9  0.6 -0.   0.9  1.   0.8  0.6 -0.2 -0.4
+ -0.5  0.4 -0.2 -1.   1.  -0.1]
+[-2.29742351 -4.42591576 -1.41104973 -2.29742351 -0.74206375  3.95276576
+  2.33305747  0.          3.91148609  4.20374655  3.09218405  2.2917778
+ -0.48645086 -0.96761503 -1.17031936  1.07415907 -0.4278428  -2.01700613
+  1.82728881 -0.2748538 ]
+[-1 -1 -1 -1 -1  1  1 -1  1  1  1  1 -1 -1 -1  1 -1 -1  1 -1]
+[-2.29742351 -4.42591576 -1.41104973 -2.29742351 -0.74206375  3.95276576
+  2.33305747  0.          3.91148609  4.20374655  3.09218405  2.2917778
+ -0.48645086 -0.96761503 -1.17031936  1.07415907 -0.4278428  -2.01700613
+  1.82728881 -0.2748538 ]
+weight=[-0.6773655  -0.83084752 -0.20228402 -0.47140276 -0.01430931  0.86339576
+  0.84207099 -0.06122353  0.83636433  1.          0.79291382  0.72776183
+ -0.2068101  -0.59771904 -0.67768829  0.67446922 -0.         -0.81569215
+  0.89628916 -0.07833614]
+weight_max_disc 4.4
+weight_min_disc -3.6
+all_possible [-3.6 -3.5 -3.4 -3.3 -3.2 -3.1 -3.  -2.9 -2.8 -2.7 -2.6 -2.5 -2.4 -2.3
+ -2.2 -2.1 -2.  -1.9 -1.8 -1.7 -1.6 -1.5 -1.4 -1.3 -1.2 -1.1 -1.  -0.9
+ -0.8 -0.7 -0.6 -0.5 -0.4 -0.3 -0.2 -0.1  0.   0.1  0.2  0.3  0.4  0.5
+  0.6  0.7  0.8  0.9  1.   1.1  1.2  1.3  1.4  1.5  1.6  1.7  1.8  1.9
+  2.   2.1  2.2  2.3  2.4  2.5  2.6  2.7  2.8  2.9  3.   3.1  3.2  3.3
+  3.4  3.5  3.6  3.7  3.8  3.9  4.   4.1  4.2  4.3  4.4]
+index of zero: 36, value check = 0.0
+Now compute 0th Shapley value
+Now compute 1th Shapley value
+Now compute 2th Shapley value
+Now compute 3th Shapley value
+Now compute 4th Shapley value
+*** Reuse Shapley Value ***
+Now compute 5th Shapley value
+Now compute 6th Shapley value
+Now compute 7th Shapley value
+Now compute 8th Shapley value
+Now compute 9th Shapley value
+Now compute 10th Shapley value
+Now compute 11th Shapley value
+Now compute 12th Shapley value
+Now compute 13th Shapley value
+Now compute 14th Shapley value
+Now compute 15th Shapley value
+Now compute 16th Shapley value
+*** Reuse Shapley Value ***
+Now compute 17th Shapley value
+Now compute 18th Shapley value
+Now compute 19th Shapley value
+weight_disc [-0.7 -0.8 -0.2 -0.5 -0.   0.9  0.8 -0.1  0.8  1.   0.8  0.7 -0.2 -0.6
+ -0.7  0.7 -0.  -0.8  0.9 -0.1]
+[-2.96694946 -3.73348049 -1.08870198 -1.7299046   0.          3.87346735
+  3.16325548 -0.71474664  3.12197581  3.93833093  3.12197581  2.27274128
+ -0.74663778 -1.2235672  -1.59951813  1.62006062  0.         -1.66560916
+  1.74459433 -0.4121087 ]
+[-1 -1 -1 -1 -1  1  1 -1  1  1  1  1 -1 -1 -1  1 -1 -1  1 -1]
+[-2.96694946 -3.73348049 -1.08870198 -1.7299046   0.          3.87346735
+  3.16325548 -0.71474664  3.12197581  3.93833093  3.12197581  2.27274128
+ -0.74663778 -1.2235672  -1.59951813  1.62006062  0.         -1.66560916
+  1.74459433 -0.4121087 ]
+weight=[-0.52268622 -0.86573069 -0.25306917 -0.53442907 -0.          1.
+  0.69959029 -0.03266076  0.97757239  0.86260257  0.97502535  0.66304471
+ -0.19443889 -0.56188527 -0.29098564  0.5351635  -0.04528643 -0.82640181
+  0.92138825 -0.01005875]
+weight_max_disc 4.8
+weight_min_disc -3.3
+all_possible [-3.3 -3.2 -3.1 -3.  -2.9 -2.8 -2.7 -2.6 -2.5 -2.4 -2.3 -2.2 -2.1 -2.
+ -1.9 -1.8 -1.7 -1.6 -1.5 -1.4 -1.3 -1.2 -1.1 -1.  -0.9 -0.8 -0.7 -0.6
+ -0.5 -0.4 -0.3 -0.2 -0.1  0.   0.1  0.2  0.3  0.4  0.5  0.6  0.7  0.8
+  0.9  1.   1.1  1.2  1.3  1.4  1.5  1.6  1.7  1.8  1.9  2.   2.1  2.2
+  2.3  2.4  2.5  2.6  2.7  2.8  2.9  3.   3.1  3.2  3.3  3.4  3.5  3.6
+  3.7  3.8  3.9  4.   4.1  4.2  4.3  4.4  4.5  4.6  4.7  4.8]
+index of zero: 33, value check = 0.0
+Now compute 0th Shapley value
+Now compute 1th Shapley value
+Now compute 2th Shapley value
+Now compute 3th Shapley value
+Now compute 4th Shapley value
+*** Reuse Shapley Value ***
+Now compute 5th Shapley value
+Now compute 6th Shapley value
+Now compute 7th Shapley value
+*** Reuse Shapley Value ***
+Now compute 8th Shapley value
+Now compute 9th Shapley value
+Now compute 10th Shapley value
+Now compute 11th Shapley value
+Now compute 12th Shapley value
+Now compute 13th Shapley value
+Now compute 14th Shapley value
+Now compute 15th Shapley value
+Now compute 16th Shapley value
+*** Reuse Shapley Value ***
+Now compute 17th Shapley value
+Now compute 18th Shapley value
+Now compute 19th Shapley value
+*** Reuse Shapley Value ***
+weight_disc [-0.5 -0.9 -0.3 -0.5 -0.   1.   0.7 -0.   1.   0.9  1.   0.7 -0.2 -0.6
+ -0.3  0.5 -0.  -0.8  0.9 -0. ]
+[-2.2905116  -4.05708172 -1.40048213 -2.2905116   0.          3.73871596
+  2.37745244  0.          3.6856421   3.16514694  3.40183398  2.33617277
+ -0.75747885 -1.53686879 -0.84406684  1.28961286  0.         -1.60777698
+  1.64498255  0.        ]
+[-1 -1 -1 -1 -1  1  1 -1  1  1  1  1 -1 -1 -1  1 -1 -1  1 -1]
+[-2.2905116  -4.05708172 -1.40048213 -2.2905116   0.          3.73871596
+  2.37745244  0.          3.6856421   3.16514694  3.40183398  2.33617277
+ -0.75747885 -1.53686879 -0.84406684  1.28961286  0.         -1.60777698
+  1.64498255  0.        ]
+weight=[ 0.40065482  0.14884509  0.          0.65209942  0.72415048 -0.29534516
+ -0.49785041  0.11782526 -0.49499337 -0.64250647 -0.23325098 -0.56308963
+  0.65015035  0.21913635  1.         -0.29090724  0.55500247  0.43434172
+ -0.36838446  0.24517686]
+weight_max_disc 3.7
+weight_min_disc -2.6
+all_possible [-2.6 -2.5 -2.4 -2.3 -2.2 -2.1 -2.  -1.9 -1.8 -1.7 -1.6 -1.5 -1.4 -1.3
+ -1.2 -1.1 -1.  -0.9 -0.8 -0.7 -0.6 -0.5 -0.4 -0.3 -0.2 -0.1  0.   0.1
+  0.2  0.3  0.4  0.5  0.6  0.7  0.8  0.9  1.   1.1  1.2  1.3  1.4  1.5
+  1.6  1.7  1.8  1.9  2.   2.1  2.2  2.3  2.4  2.5  2.6  2.7  2.8  2.9
+  3.   3.1  3.2  3.3  3.4  3.5  3.6  3.7]
+index of zero: 26, value check = 0.0
+Now compute 0th Shapley value
+Now compute 1th Shapley value
+Now compute 2th Shapley value
+*** Reuse Shapley Value ***
+Now compute 3th Shapley value
+Now compute 4th Shapley value
+Now compute 5th Shapley value
+Now compute 6th Shapley value
+Now compute 7th Shapley value
+Now compute 8th Shapley value
+Now compute 9th Shapley value
+Now compute 10th Shapley value
+Now compute 11th Shapley value
+Now compute 12th Shapley value
+Now compute 13th Shapley value
+Now compute 14th Shapley value
+Now compute 15th Shapley value
+Now compute 16th Shapley value
+Now compute 17th Shapley value
+Now compute 18th Shapley value
+Now compute 19th Shapley value
+weight_disc [ 0.4  0.1  0.   0.7  0.7 -0.3 -0.5  0.1 -0.5 -0.6 -0.2 -0.6  0.7  0.2
+  1.  -0.3  0.6  0.4 -0.4  0.2]
+[ 2.21871318  0.84906863  0.          4.33828375  4.33828375 -2.03053775
+ -2.94617663  0.84906863 -2.93438244 -3.54243426 -1.19955724 -3.0066869
+  2.62544181  0.61953002  2.68522422 -1.06973505  1.65140415  1.0545453
+ -1.14527741  0.49441004]
+[ 1  1  1  1  1 -1 -1  1 -1 -1 -1 -1  1  1  1 -1  1  1 -1  1]
+[ 2.21871318  0.84906863  0.          4.33828375  4.33828375 -2.03053775
+ -2.94617663  0.84906863 -2.93438244 -3.54243426 -1.19955724 -3.0066869
+  2.62544181  0.61953002  2.68522422 -1.06973505  1.65140415  1.0545453
+ -1.14527741  0.49441004]
+Data Value Computed; Value Name: fastWKNN-SV-old; Runtime: 30.865 s
+Task: mislabel_detect
+*** fastWKNN-SV-old F1-Rank: 1.0 (0.0), F1-Cluster: 0.667 (0.0), AUROC: 1.0 (0.0), eps=-1, delta=1e-05, K=5, tau=0 ***
+
+
+
+[ 1  1  1  1  1 -1 -1  1 -1 -1 -1 -1  1  1  1 -1  1  1 -1  1]
+[ 1.91070814  0.34049585  0.          3.46279787  3.46279787 -1.38692835
+ -3.17147163  0.34049585 -3.17147163 -3.93406069 -0.90204816 -3.93406069
+  3.46279787  0.61880663  5.01069905 -1.38692835  2.95872196  1.91070814
+ -2.14777294  0.6907347 ]
