@@ -1625,7 +1625,6 @@ def fastweighted_knn_shapley_single(x_train_few, y_train_few, x_test, y_test, K,
 
       # Compute l_star s.t. error <= eps
       err = 0
-      # print('eps={}'.format(eps))
       if eps > 0:
         l_star = N+1
         while err < eps:
@@ -1680,9 +1679,11 @@ def fastweighted_knn_shapley_single(x_train_few, y_train_few, x_test, y_test, K,
               start_val, end_val = -wm, -wi-interval
               start_ind, end_ind = val_ind_map[round(start_val, n_digit)], val_ind_map[round(end_val, n_digit)]
 
-        Gi[K:N] += np.sum(Fi[m, K:N, start_ind:end_ind+1], axis=1)
+        Gi[K:l_star] += np.sum(Fi[m, K:l_star, start_ind:end_ind+1], axis=1)
 
       Gi_l = Gi[1:]/I[1:]
+
+      print(Gi_l)
 
       t_computeGi += (time.time() - t_Gi)
 
