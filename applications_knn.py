@@ -154,7 +154,7 @@ print('acc_TNN={}'.format(get_tnn_acc(x_train, y_train, x_val, y_val, tau=-0.5, 
 knn_val_collection = ['KNN-SV', 'KNN-SV-RJ', 'KNN-SV-JW', 'TNN-BZ', 'TNN-BZ-private', 'TNN-SV', 
                       'TNN-SV-private', 'KNN-SV-RJ-private', 'KNN-SV-RJ-private-withsub', 'KNN-BZ-private-fixeps', 
                       'TNN-SV-private-JDP', 'WTNN-SV', 'fastWTNN-SV', 'WKNN-SV', 'fastWKNN-SV', 'approxfastWKNN-SV', 
-                      'fastWKNN-SV-old']
+                      'fastWKNN-SV-old', 'fastWKNN-SV-cache']
 
 
 if value_type != 'Uniform' and value_type != 'inf' and value_type not in knn_val_collection:
@@ -257,6 +257,8 @@ for i in range(n_repeat):
     sv = weighted_knn_shapley(x_train, y_train, x_val, y_val, K=K, dis_metric=dis_metric, kernel=args.kernel, debug=args.debug)
   elif value_type == 'fastWKNN-SV':
     sv = fastweighted_knn_shapley(x_train, y_train, x_val, y_val, eps=args.eps, K=K, dis_metric=dis_metric, kernel=args.kernel, debug=args.debug)
+  elif value_type == 'fastWKNN-SV-cache':
+    sv = fastweighted_knn_shapley_cache(x_train, y_train, x_val, y_val, eps=args.eps, K=K, dis_metric=dis_metric, kernel=args.kernel, debug=args.debug)
   elif value_type == 'fastWKNN-SV-old':
     sv = fastweighted_knn_shapley_old(x_train, y_train, x_val, y_val, K=K, dis_metric=dis_metric, kernel=args.kernel, debug=args.debug)
   elif value_type == 'approxfastWKNN-SV':

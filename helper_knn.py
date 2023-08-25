@@ -1568,7 +1568,6 @@ def fastweighted_knn_shapley_single(x_train_few, y_train_few, x_test, y_test, K,
 
   print('Computed F; Time: {}'.format(time.time()-t_F))
 
-  t_Fi = time.time()
   t_Ei = 0
   t_bigloop = 0
   t_computeGi = 0
@@ -1578,7 +1577,31 @@ def fastweighted_knn_shapley_single(x_train_few, y_train_few, x_test, y_test, K,
   # error bound for setting Gi(l)=0; TODO: improve the efficiency of computing E(i, l)
   def E(i, l):
     i = i+1
-    return np.sum( [comb(i-1, j)*comb(N-i, l-j) for j in range(K)] / comb(N-1, l) )
+    return np.sum( [comb(i-1, j)*comb(N-i, l-j) for j in range(K)] / I[l] )
+
+  # E_precompute = np.zeros((N, N))
+  # for i in range(N):
+  #   for l in range(1, N):
+  #     E_precompute[i, l] = E(i, l)
+
+  t_Fi = time.time()
+
+  # def E(i, l):
+  #   wi = weight_disc[i]
+  #   err = 0
+  #   for m in range(max(K-1, i+1), N):
+  #       wm = weight_disc[m]
+  #       start_ind, end_ind = 0, -1
+  #       if wi > 0 and wm < wi: 
+  #         start_val, end_val = -wi, -wm-interval
+  #         start_ind, end_ind = val_ind_map[round(start_val, n_digit)], val_ind_map[round(end_val, n_digit)]
+  #       elif wi < 0 and wm > wi:
+  #         start_val, end_val = -wm, -wi-interval
+  #         start_ind, end_ind = val_ind_map[round(start_val, n_digit)], val_ind_map[round(end_val, n_digit)]
+  #       # print(F[m, l, :])
+  #       # print(F[m, l, start_ind:end_ind+1])
+  #       err += np.sum(F[m, l, start_ind:end_ind+1])
+  #   return err / comb(N-1, l)
 
   sv_cache = {}
   sv_cache[0] = 0
@@ -1629,10 +1652,14 @@ def fastweighted_knn_shapley_single(x_train_few, y_train_few, x_test, y_test, K,
         l_star = N+1
         while err < eps:
           l_star -= 1
-          err += E(i, l_star-1)
+          # err_l = E_precompute[i, l_star-1]
+          err_l = E(i, l_star-1)
+          # print('err_l={}'.format(err_l))
+          err += err_l
       else:
         l_star = N
 
+      print('i={}, Time Compute Lstar={}'.format(i, time.time()-t_Ei_s))
       t_Ei += time.time()-t_Ei_s
 
       print('l_star = {}'.format(l_star))
@@ -1683,7 +1710,7 @@ def fastweighted_knn_shapley_single(x_train_few, y_train_few, x_test, y_test, K,
 
       Gi_l = Gi[1:]/I[1:]
 
-      print(Gi_l)
+      # print(Gi_l)
 
       t_computeGi += (time.time() - t_Gi)
 
@@ -1722,6 +1749,274 @@ def fastweighted_knn_shapley(x_train_few, y_train_few, x_val_few, y_val_few, K, 
     sv += fastweighted_knn_shapley_single(x_train_few, y_train_few, x_test, y_test, K, eps, dis_metric, kernel, debug)
 
   return sv
+
+
+
+
+# x_test, y_test are single data point
+# eps: precision
+def fastweighted_knn_shapley_cache_single(x_train_few, y_train_few, x_test, y_test, K, eps=0, dis_metric='cosine', kernel='rbf', debug=True):
+
+  N = len(y_train_few)
+  sv = np.zeros(N)
+
+  C = max(y_train_few)+1
+
+  # Currently only work for binary classification
+  assert C==2
+
+  # Currently only work for K>1
+  assert K > 1
+
+  # Compute distance
+  distance = compute_dist(x_train_few, x_test, dis_metric)
+
+  # Compute weights
+  weight = compute_weights(distance, kernel)
+
+  # We normalize each weight to [0, 1]
+  if max(weight) - min(weight) > 0:
+    weight = (weight - min(weight)) / (max(weight) - min(weight))
+
+  # Give each weight sign
+  weight = weight * ( 2*(y_train_few==y_test)-1 )
+  if debug: print('weight={}'.format(weight))
+
+  # Discretize weight to 0.1 precision
+  n_digit = 1
+  interval = 10**(-n_digit)
+  weight_disc = np.round(weight, n_digit)
+
+  # reorder weight_disc based on rank
+  rank = np.argsort(distance)
+  weight_disc = weight_disc[rank]
+
+  # maximum possible range of weights  
+  weight_max_disc, weight_min_disc, N_possible, all_possible, V = get_range(weight_disc, n_digit, interval, K)
+  
+  if debug: 
+    print('weight_max_disc', weight_max_disc)
+    print('weight_min_disc', weight_min_disc)
+    print('all_possible', all_possible)
+
+  val_ind_map = {}
+  for j, val in enumerate(all_possible):
+    val_ind_map[np.round(val, n_digit)] = j
+
+  index_zero = val_ind_map[0]
+  if debug:
+    print('index of zero: {}, value check = {}'.format(index_zero, all_possible[index_zero]))
+
+
+  t_F = time.time()
+
+  # set size+1 for each entry for convenience
+  F = np.zeros((N, N+1, V))
+
+  # Initialize for l=1
+  for m in range(0, N):
+    wm = weight_disc[m]
+    ind_m = val_ind_map[wm]
+    F[m, 1, ind_m] = 1
+      
+  # For 2 <= l <= K-1
+  for l in range(2, K):
+    for m in range(l-1, N):
+
+      wm = weight_disc[m]
+      check_vals = np.round(all_possible - wm, n_digit)
+
+      for j, s in enumerate(all_possible):
+        check_val = check_vals[j]
+        if check_val < weight_min_disc or check_val > weight_max_disc:
+          F[m, l, j] = 0
+        else:
+          ind_sm = val_ind_map[check_val]
+          F[m, l, j] += np.sum(F[:m, l-1, ind_sm])
+
+  l_values, m_values = np.ogrid[K:N+1, K-1:N]
+  H = np.zeros((N+1, N))
+  H[K:N+1, K-1:N] = comb(N-1-m_values, l_values-K)
+
+  for j, s in enumerate(all_possible):
+    Q = np.sum(F[:(K-1), K-1, j])
+    for m in range(K-1, N):
+      F[m, K:(N+1), j] = Q * H[K:(N+1), m]
+      Q += F[m, K-1, j]
+
+  print('Computed F; Time: {}'.format(time.time()-t_F))
+
+  t_Ei = 0
+  t_bigloop = 0
+  t_computeGi = 0
+  
+  I = np.array([ comb(N-1, l) for l in range(0, N) ])
+
+  # error bound for setting Gi(l)=0; TODO: improve the efficiency of computing E(i, l)
+  def E(i, l):
+    i = i+1
+    return np.sum( [comb(i-1, j)*comb(N-i, l-j) for j in range(K)] / I[l] )
+
+  # E_precompute = np.zeros((N, N))
+  # for i in range(N):
+  #   for l in range(1, N):
+  #     E_precompute[i, l] = E(i, l)
+
+  t_Fi = time.time()
+
+  sv_cache = {}
+  sv_cache[0] = 0
+
+  for i in range(N):
+    # print('Now compute {}th Shapley value'.format(i))
+
+    wi = weight_disc[i]
+
+    if wi in sv_cache:
+      sv[i] = sv_cache[wi]
+      # print('*** Reuse Shapley Value ***')
+
+    else:
+
+      # set size+1 for each entry for convenience
+      Fi = np.zeros((N, N, V))
+
+      t_Fi_start = time.time()
+
+      # Initialize for l=1
+      for m in range(0, N):
+        if m != i:
+          wm = weight_disc[m]
+          ind_m = val_ind_map[wm]
+          Fi[m, 1, ind_m] = 1
+
+      check_vals = np.round(all_possible-wi, n_digit)
+      valid_indices = np.logical_and(check_vals >= weight_min_disc, check_vals <= weight_max_disc)
+      invalid_indices = ~valid_indices
+      mapped_inds = np.array([val_ind_map[val] for val in check_vals[valid_indices]])
+
+      # For 2 <= l <= K-1
+      for l in range(2, K):
+        Fi[l-1:i, l, :] = F[l-1:i, l, :]
+
+      for l in range(2, K):
+        Fi[max(l-1, i+1):N, l, valid_indices] = F[max(l-1, i+1):N, l, valid_indices] - Fi[max(l-1, i+1):N, l-1, mapped_inds]
+        Fi[max(l-1, i+1):N, l, invalid_indices] = F[max(l-1, i+1):N, l, invalid_indices]
+        
+      print('i={}, small_loop={}'.format(i, time.time()-t_Fi_start))
+
+      t_Ei_s = time.time()
+
+      # Compute l_star s.t. error <= eps
+      err = 0
+      if eps > 0:
+        l_star = N+1
+        while err < eps:
+          l_star -= 1
+          # err_l = E_precompute[i, l_star-1]
+          err_l = E(i, l_star-1)
+          # print('err_l={}'.format(err_l))
+          err += err_l
+      else:
+        l_star = N
+
+      print('i={}, Time Compute Lstar={}'.format(i, time.time()-t_Ei_s))
+      t_Ei += time.time()-t_Ei_s
+
+      print('l_star = {}'.format(l_star))
+
+      """
+      t_bigloop_s = time.time()
+      for m in range( max(i+1, K-1), N ):
+        wm = weight_disc[m]
+        check_vals = np.round(all_possible-wi+wm, n_digit)
+        valid_indices = np.logical_and(check_vals >= weight_min_disc, check_vals <= weight_max_disc)
+        mapped_inds = np.array([val_ind_map[val] for val in check_vals[valid_indices]])
+        H_reshaped = H[K:l_star, m][:, np.newaxis]  # (l_star - K, 1)
+        updates = Fi[m, K - 1, mapped_inds] * H_reshaped  # (l_star - K, len(mapped_inds))
+        Fi[m, K:l_star, valid_indices] = F[m, K:l_star, valid_indices] - updates.T
+        Fi[m, K:l_star, ~valid_indices] = F[m, K:l_star, ~valid_indices]
+      print('i={}, bigloop={}'.format(i, time.time()-t_Fi_start))
+      t_bigloop += (time.time() - t_bigloop_s)
+      """
+
+      Gi = np.zeros(N)
+
+      t_Gi = time.time()
+
+      start_ind, end_ind = 0, -1
+      if wi > 0: 
+        start_val, end_val = -wi, -interval
+        start_ind, end_ind = val_ind_map[round(start_val, n_digit)], val_ind_map[round(end_val, n_digit)]
+      elif wi < 0:
+        start_val, end_val = 0, -wi-interval
+        start_ind, end_ind = val_ind_map[round(start_val, n_digit)], val_ind_map[round(end_val, n_digit)]
+
+      for m in range(N):
+        if i != m:
+          Gi[1:K] += np.sum(Fi[m, 1:K, start_ind:end_ind+1], axis=1)
+
+
+      # Precompute Ri
+      Ri = np.zeros(N)
+      for m in range(max(i+1, K), N):
+        wm = weight_disc[m]
+        start_ind, end_ind = 0, -1
+        if wi > 0 and wm < wi: 
+          start_val, end_val = -wi, -wm-interval
+          start_ind, end_ind = val_ind_map[round(start_val, n_digit)], val_ind_map[round(end_val, n_digit)]
+        elif wi < 0 and wm > wi:
+          start_val, end_val = -wm, -wi-interval
+          start_ind, end_ind = val_ind_map[round(start_val, n_digit)], val_ind_map[round(end_val, n_digit)]
+        Ri[m] = np.sum(Fi[:m, K-1, start_ind:end_ind+1])
+
+      # Gi[K:l_star] = np.sum(H[K:l_star, :] * Ri, axis=1)
+      # Gi_l = Gi[1:]/I[1:]
+      # sv[i] = np.sum(Gi_l)
+
+      sv[i] = np.sum([ Ri[m] * comb(m, K)**(-1) * N / (m+1) for m in range(max(i+1, K), N)])
+      sv[i] += np.sum( Gi[1:K] / I[1:K] )
+
+      t_computeGi += (time.time() - t_Gi)
+
+      if wi < 0:
+        sv[i] += 1 # for l=0
+        sv[i] = -sv[i]
+
+  print('Computed Fi; Time: {}, Ei_time={}, BigLoop={}, t_computeGi={}'.format(time.time()-t_Fi, t_Ei, t_bigloop, t_computeGi))
+
+  if debug: 
+    print('weight_disc', weight_disc)
+    print(sv)
+
+  sv_real = np.zeros(N)
+  sv_real[rank] = sv
+  sv = sv_real
+
+  if debug: 
+    print(2*(y_train_few==y_test)-1)
+    print(sv)
+    print('Sanity check: sum of SV = {}, U(N)-U(empty)={}'.format(
+      np.sum(sv) / N, int(np.sum(weight_disc[:K]) >= 0)-1 ))
+
+  return sv
+
+
+def fastweighted_knn_shapley_cache(x_train_few, y_train_few, x_val_few, y_val_few, K, eps, dis_metric='cosine', kernel='rbf', debug=True):
+  
+  N = len(y_train_few)
+  sv = np.zeros(N)
+  n_test = len(y_val_few)
+
+  for i in tqdm(range(n_test)):
+    x_test, y_test = x_val_few[i], y_val_few[i]
+    sv += fastweighted_knn_shapley_cache_single(x_train_few, y_train_few, x_test, y_test, K, eps, dis_metric, kernel, debug)
+
+  return sv
+
+
+
+
 
 
 
