@@ -10,6 +10,8 @@
 #SBATCH --mem-per-cpu=8G
 #SBATCH --time=23:59:59
 
+#SBATCH --constraint=skylake
+
 #SBATCH --output=/scratch/gpfs/tw8948/slurm-%j.out
 #SBATCH --error=/scratch/gpfs/tw8948/slurm-%j.out
 

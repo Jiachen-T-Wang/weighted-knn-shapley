@@ -61,7 +61,7 @@ parser.add_argument('--kernel', type=str, default='plain') # uniform
 
 # No use for this project
 parser.add_argument('--model_type', type=str, default='')
-parser.add_argument('--n_repeat', type=int, default=5)
+parser.add_argument('--n_repeat', type=int, default=1)
 parser.add_argument('--n_sample', type=int, default=0)
 parser.add_argument('--batch_size', type=int, default=8)
 parser.add_argument('--lr', type=float, default=1e-3)
@@ -257,8 +257,6 @@ for i in range(n_repeat):
     sv = weighted_knn_shapley(x_train, y_train, x_val, y_val, K=K, dis_metric=dis_metric, kernel=args.kernel, debug=args.debug)
   elif value_type == 'fastWKNN-SV':
     sv = fastweighted_knn_shapley(x_train, y_train, x_val, y_val, eps=args.eps, K=K, dis_metric=dis_metric, kernel=args.kernel, debug=args.debug)
-  elif value_type == 'fastWKNN-SV-cache':
-    sv = fastweighted_knn_shapley_cache(x_train, y_train, x_val, y_val, eps=args.eps, K=K, dis_metric=dis_metric, kernel=args.kernel, debug=args.debug)
   elif value_type == 'fastWKNN-SV-old':
     sv = fastweighted_knn_shapley_old(x_train, y_train, x_val, y_val, K=K, dis_metric=dis_metric, kernel=args.kernel, debug=args.debug)
   elif value_type == 'approxfastWKNN-SV':
@@ -321,8 +319,6 @@ for i in range(n_repeat):
 
     rank = np.argsort(sv)[::-1]
     acc_lst = []
-
-    # pdb.set_trace()
     
     for k in np.linspace(0, int(args.n_data/2), num=11).astype(int)[1:]:
 
@@ -337,6 +333,7 @@ for i in range(n_repeat):
     data_lst.append(acc_lst)
 
   elif task=='collect_sv':
+
     sv_collect.append(sv)
 
 
