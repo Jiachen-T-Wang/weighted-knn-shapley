@@ -101,7 +101,7 @@ dis_metric = args.dis_metric
 big_dataset = config.big_dataset
 OpenML_dataset = config.OpenML_dataset
 
-save_dir = 'result/'
+save_dir = 'wtnn_result/'
 
 verbose = 0
 if args.debug:
@@ -113,7 +113,7 @@ if task != 'mislabel_detect':
   u_func = get_ufunc(dataset, model_type, batch_size, lr, verbose)
 
 
-if task=='mislabel_detect':
+if task in ['mislabel_detect', 'collect_sv', 'select_for_weightedknn']:
   x_train, y_train, x_val, y_val = get_processed_data(dataset, n_data, n_val, flip_ratio, noisy_data=False, normalize=args.normalize)
 elif task=='noisy_detect':
   x_train, y_train, x_val, y_val = get_processed_data(dataset, n_data, n_val, flip_ratio, noisy_data=True)
@@ -295,7 +295,20 @@ for i in range(n_repeat):
     acc1, acc2, auc = kmeans_f1score(sv, cluster=False), kmeans_f1score(sv, cluster=True), kmeans_aucroc(sv)
     data_lst.append( [acc1, acc2, auc] )
 
+  elif task in ['select_for_weightedknn']:
+
+    rank = np.argsort(sv)[::-1]
+    acc_lst = []
     
+    acc = weighted_knn_classification_error(x_train, y_train, x_val, y_val, K=args.K, dis_metric=dis_metric)
+    print(acc)
+
+    for k in np.linspace(0, int(args.n_data), num=11).astype(int)[1:]:
+      acc = weighted_knn_classification_error(x_train[rank[:k]], y_train[rank[:k]], x_val, y_val, 
+                                              K=args.K, dis_metric=dis_metric)
+      acc_lst.append(acc)
+    print(acc_lst)
+
   elif task=='data_removal':
 
     rank = np.argsort(sv)
@@ -372,8 +385,6 @@ elif task == 'data_add':
 
 elif task == 'collect_sv':
 
-  file_name = 'SV_{}_{}_{}_{}_{}_{}_{}_{}_{}_{}_{}.result'.format(args.dataset, args.value_type, args.model_type, args.n_data, args.n_val, 
-                                                                           args.n_repeat, args.n_sample, args.flip_ratio, args.alpha, args.beta, args.card )
-  
+  file_name = 'SV_{}_{}_{}_{}_{}.result'.format(args.dataset, args.value_type, args.n_data, args.n_val, args.eps)
   pickle.dump( sv_collect, open(save_dir + file_name, 'wb') )
 
