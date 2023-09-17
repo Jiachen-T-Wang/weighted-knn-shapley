@@ -1465,20 +1465,6 @@ def compute_weights(distance, kernel):
 
   return weight
 
-def get_range(weight_disc, n_digit, interval, K):
-
-  sort_pos = np.sort(weight_disc[weight_disc>0])[::-1]
-  sort_neg = np.sort(weight_disc[weight_disc<0])
-
-  weight_max_disc = np.round(np.sum(sort_pos[:min(K, len(sort_pos))]), n_digit)
-  weight_min_disc = np.round(np.sum(sort_neg[:min(K, len(sort_neg))]), n_digit)
-
-  N_possible = int(np.round( (weight_max_disc-weight_min_disc)/interval )) + 1
-  all_possible = np.linspace(weight_min_disc, weight_max_disc, N_possible)
-  V = len(all_possible)
-
-  return weight_max_disc, weight_min_disc, N_possible, all_possible, V
-
 
 # # x_test, y_test are single data point
 # # eps: precision
@@ -1788,18 +1774,48 @@ def weighted_knn_classification_error(x_train, y_train, x_test, y_test, K, dis_m
 
 
 
+def adjust_weights(weight, y_train_few, y_test, y_consider):
+    
+    # Sanity check
+    assert y_consider >= 0
+    assert y_consider != y_test
+
+    adjusted_weights = np.zeros_like(weight)
+    adjusted_weights[y_train_few == y_test] = weight[y_train_few == y_test]
+    adjusted_weights[y_train_few == y_consider] = -weight[y_train_few == y_consider]
+    return adjusted_weights.astype(np.float64)
+
+
+def get_range(weight_disc, n_digit, interval, K):
+
+  sort_pos = np.sort(weight_disc[weight_disc>0])[::-1]
+  sort_neg = np.sort(weight_disc[weight_disc<0])
+
+  weight_max_disc = np.round(np.sum(sort_pos[:min(K, len(sort_pos))]), n_digit)
+  weight_min_disc = np.round(np.sum(sort_neg[:min(K, len(sort_neg))]), n_digit)
+
+  N_possible = int(np.round( (weight_max_disc-weight_min_disc)/interval )) + 1
+  all_possible = np.linspace(weight_min_disc, weight_max_disc, N_possible)
+  V = len(all_possible)
+
+  return weight_max_disc, weight_min_disc, N_possible, all_possible, V
+
+
+def normalize_weight(weight):
+  if max(weight) - min(weight) > 0:
+    weight = (weight - min(weight)) / (max(weight) - min(weight))
+  return weight
+
 
 # x_test, y_test are single data point
 # eps: precision
-def fastweighted_knn_shapley_single(x_train_few, y_train_few, x_test, y_test, K, eps=0, dis_metric='cosine', kernel='rbf', debug=True):
+# y_consider: for multi-class scenario
+def fastweighted_knn_shapley_single(x_train_few, y_train_few, x_test, y_test, K, eps=0, dis_metric='cosine', kernel='rbf', 
+                                    y_consider=None, debug=True):
 
   N = len(y_train_few)
   sv = np.zeros(N)
-
   C = max(y_train_few)+1
-
-  # Currently only work for binary classification
-  assert C==2
 
   # Currently only work for K>1
   assert K > 1
@@ -1811,11 +1827,14 @@ def fastweighted_knn_shapley_single(x_train_few, y_train_few, x_test, y_test, K,
   weight = compute_weights(distance, kernel)
 
   # We normalize each weight to [0, 1]
-  if max(weight) - min(weight) > 0:
-    weight = (weight - min(weight)) / (max(weight) - min(weight))
+  weight = normalize_weight(weight)
 
-  # Give each weight sign
-  weight = weight * ( 2*(y_train_few==y_test)-1 )
+  # Adjust weights to give sign
+  if C == 2:
+    weight = weight * ( 2*(y_train_few==y_test)-1 )
+  else:
+    weight = adjust_weights(weight, y_train_few, y_test, y_consider)
+
   if debug: print('weight={}'.format(weight))
 
   # Discretize weight to 0.1 precision
@@ -1823,7 +1842,7 @@ def fastweighted_knn_shapley_single(x_train_few, y_train_few, x_test, y_test, K,
   interval = 10**(-n_digit)
   weight_disc = np.round(weight, n_digit)
 
-  # reorder weight_disc based on rank
+  # reorder weight_disc based on distance rank
   rank = np.argsort(distance)
   weight_disc = weight_disc[rank]
 
@@ -1834,14 +1853,14 @@ def fastweighted_knn_shapley_single(x_train_few, y_train_few, x_test, y_test, K,
     print('weight_max_disc', weight_max_disc)
     print('weight_min_disc', weight_min_disc)
     print('all_possible', all_possible)
+    print('weight_disc', weight_disc)
 
   val_ind_map = {}
   for j, val in enumerate(all_possible):
     val_ind_map[np.round(val, n_digit)] = j
 
   index_zero = val_ind_map[0]
-  if debug:
-    print('index of zero: {}, value check = {}'.format(index_zero, all_possible[index_zero]))
+  if debug: print('index of zero: {}, value check = {}'.format(index_zero, all_possible[index_zero]))
 
 
   # error bound; TODO: improve the efficiency
@@ -1917,13 +1936,11 @@ def fastweighted_knn_shapley_single(x_train_few, y_train_few, x_test, y_test, K,
   sv_cache[0] = 0
 
   for i in range(N):
-    # print('Now compute {}th Shapley value'.format(i))
 
     wi = weight_disc[i]
 
     if wi in sv_cache:
       sv[i] = sv_cache[wi]
-      # print('*** Reuse Shapley Value ***')
 
     else:
 
@@ -1987,21 +2004,46 @@ def fastweighted_knn_shapley_single(x_train_few, y_train_few, x_test, y_test, K,
       for m in range(max(i+1, K), m_star+1):
         wm = weight_disc[m]
         _, end_ind_m = 0, -1
-        if wi > 0 and wm < wi: 
-          end_val = -wm-interval
+        if wi > 0 and wm < wi:
+
+          end_val = max(-wm-interval, weight_min_disc)
+          end_val = min(end_val, weight_max_disc)
+
           end_ind_m = val_ind_map[round(end_val, n_digit)]
           Ri[m] = np.sum(R0[:end_ind_m+1-start_ind])
         elif wi < 0 and wm > wi:
-          start_val = -wm
+          
+          start_val = max(-wm, weight_min_disc)
+          start_val = min(start_val, weight_max_disc)
+
           start_ind_m = val_ind_map[round(start_val, n_digit)]
           Ri[m] = np.sum(R0[start_ind_m-start_ind:])
         R0 += Fi[m, K-1, start_ind:end_ind+1]
 
-      if debug:
-        pass
-        # print('Ri={}'.format(Ri))
+      ### Test New Approximation Algorithm
+      # for m in range(m_star+1, N):
+      #   wm = weight_disc[m]
+      #   _, end_ind_m = 0, -1
+      #   if wi > 0 and wm < wi:
 
-      sv[i] = np.sum( Ri[max(i+1, K):(m_star+1)] * comb_values[max(i+1, K):(m_star+1)] * N / deno_values[max(i+1, K):(m_star+1)] )
+      #     end_val = max(-wm-interval, weight_min_disc)
+      #     end_val = min(end_val, weight_max_disc)
+
+      #     end_ind_m = val_ind_map[round(end_val, n_digit)]
+      #     Ri[m] = np.sum(R0[:end_ind_m+1-start_ind])
+      #   elif wi < 0 and wm > wi:
+          
+      #     start_val = max(-wm, weight_min_disc)
+      #     start_val = min(start_val, weight_max_disc)
+
+      #     start_ind_m = val_ind_map[round(start_val, n_digit)]
+      #     Ri[m] = np.sum(R0[start_ind_m-start_ind:])
+
+      if debug:
+        print('Ri={}'.format(Ri))
+
+      # sv[i] = np.sum( Ri[max(i+1, K):(m_star+1)] * comb_values[max(i+1, K):(m_star+1)] * N / deno_values[max(i+1, K):(m_star+1)] )
+      sv[i] = np.sum( Ri[max(i+1, K):] * comb_values[max(i+1, K):] * N / deno_values[max(i+1, K):] )
       sv[i] += np.sum( Gi[1:K] / I[1:K] )
 
       if wi < 0:
@@ -2023,25 +2065,46 @@ def fastweighted_knn_shapley_single(x_train_few, y_train_few, x_test, y_test, K,
   sv_real[rank] = sv
   sv = sv_real
 
-  if debug: 
-    print(2*(y_train_few==y_test)-1)
-    print(sv / N)
-
   print('Sanity check: sum of SV = {}, U(N)-U(empty)={}'.format(
-      np.sum(sv) / N, int(np.sum(weight_disc[:K]) >= 0)-1 ))
+      np.sum(sv) / N, int(np.sum(weight_disc[:K]) >= 0)-1 )
+  )
+
+  sv = sv / N
+  if debug: 
+    print(sv)
 
   return sv
 
 
-def fastweighted_knn_shapley(x_train_few, y_train_few, x_val_few, y_val_few, K, eps, dis_metric='cosine', kernel='rbf', debug=True):
+def fastweighted_knn_shapley(x_train_few, y_train_few, x_val_few, y_val_few, K, 
+                             eps, dis_metric='cosine', kernel='rbf', debug=True):
   
   N = len(y_train_few)
   sv = np.zeros(N)
+
   n_test = len(y_val_few)
+  C = max(y_train_few)+1
+
+  print('Number of classes = {}'.format(C))
+
+  distinct_classes = np.arange(C)
 
   for i in tqdm(range(n_test)):
+
     x_test, y_test = x_val_few[i], y_val_few[i]
-    sv += fastweighted_knn_shapley_single(x_train_few, y_train_few, x_test, y_test, K, eps, dis_metric, kernel, debug)
+
+    if C==2:
+      sv_i = fastweighted_knn_shapley_single(x_train_few, y_train_few, x_test, y_test, K, eps, dis_metric, kernel, debug)
+    else:
+      sv_i = np.zeros(N)
+      classes_to_enumerate = distinct_classes[distinct_classes != y_test]
+      for c in classes_to_enumerate:
+        sv_i += fastweighted_knn_shapley_single(
+          x_train_few, y_train_few, x_test, y_test, K, 
+          eps=eps, dis_metric=dis_metric, kernel=kernel, debug=debug, y_consider=c
+        )
+        
+    sv += sv_i
 
   return sv
 

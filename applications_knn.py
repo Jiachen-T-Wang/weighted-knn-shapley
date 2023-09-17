@@ -109,8 +109,8 @@ if args.debug:
 
 batch_size = 32
 
-if task != 'mislabel_detect':
-  u_func = get_ufunc(dataset, model_type, batch_size, lr, verbose)
+# if task != 'mislabel_detect':
+#   u_func = get_ufunc(dataset, model_type, batch_size, lr, verbose)
 
 
 if task in ['mislabel_detect', 'collect_sv', 'select_for_weightedknn']:
@@ -118,9 +118,9 @@ if task in ['mislabel_detect', 'collect_sv', 'select_for_weightedknn']:
 elif task=='noisy_detect':
   x_train, y_train, x_val, y_val = get_processed_data(dataset, n_data, n_val, flip_ratio, noisy_data=True)
 
-
-print(y_train)
-
+print('Data Loaded; Shape={} {} {} {}'.format(
+  x_train.shape, y_train.shape, x_val.shape, y_val.shape
+))
 
 if args.normalizerow and dataset in OpenML_dataset:
   x_train, y_train, x_val, y_val = get_processed_data_clip(dataset, n_data, n_val, flip_ratio)

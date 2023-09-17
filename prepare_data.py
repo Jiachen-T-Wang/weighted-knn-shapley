@@ -219,13 +219,54 @@ def get_processed_data(dataset, n_data, n_val, flip_ratio, minor_ratio=0.5, nois
         x_train, y_train = data[:n_data], labels[:n_data]
         x_val, y_val = data[n_data:], labels[n_data:]
 
-    else:
+    elif dataset == 'MNIST':
         x_train, y_train, x_test, y_test = get_data(dataset)
+
+        x_train = x_train.reshape(x_train.shape[0], -1)
+        x_test = x_test.reshape(x_test.shape[0], -1)
+
+        x_train, y_train = x_train[:n_data], y_train[:n_data]
+        x_test, y_test = x_test[:n_val], y_test[:n_val]
+
+        # if dataset != 'covertype':
+        #     x_train, y_train = make_balance_sample_multiclass(x_train, y_train, n_data)
+        #     x_test, y_test = make_balance_sample_multiclass(x_test, y_test, n_val)
+
         x_val, y_val = x_test, y_test
 
-        if dataset != 'covertype':
-            x_train, y_train = make_balance_sample_multiclass(x_train, y_train, n_data)
-            x_val, y_val = make_balance_sample_multiclass(x_test, y_test, n_data)
+    elif dataset == 'CIFAR10_CLIP':
+
+        _, y_train, _, _ = get_cifar()
+
+        feature_extractor = 'CLIP'
+
+        x_train = pickle.load( open('../datavalue-diffusion/save_image_and_file/{}_{}{}'.format(
+            'cifar10', feature_extractor, '.fea'), 'rb') )
+        x_val, y_val = x_train[:n_val], y_train[:n_val]
+        x_train, y_train = x_train[n_val:n_val+n_data], y_train[n_val:n_val+n_data]
+
+    elif dataset == 'CIFAR10_ImageNet':
+
+        _, y_train, _, _ = get_cifar()
+
+        feature_extractor = 'ImageNet'
+        
+        x_train = pickle.load( open('../datavalue-diffusion/save_image_and_file/{}_{}{}'.format(
+            'cifar10', feature_extractor, '.fea'), 'rb') )
+        x_val, y_val = x_train[:n_val], y_train[:n_val]
+        x_train, y_train = x_train[n_val:n_val+n_data], y_train[n_val:n_val+n_data]
+
+    elif dataset == 'CIFAR10_CIFAR10':
+
+        _, y_train, _, _ = get_cifar()
+
+        feature_extractor = 'CIFAR10'
+        
+        x_train = pickle.load( open('../datavalue-diffusion/save_image_and_file/{}_{}{}'.format(
+            'cifar10', feature_extractor, '.fea'), 'rb') )
+        x_val, y_val = x_train[:n_val], y_train[:n_val]
+        x_train, y_train = x_train[n_val:n_val+n_data], y_train[n_val:n_val+n_data]
+
 
     assert len(y_train.shape)==1
     n_class = len(np.unique(y_train))
