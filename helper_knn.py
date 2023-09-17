@@ -1807,18 +1807,10 @@ def normalize_weight(weight):
   return weight
 
 
-# x_test, y_test are single data point
-# eps: precision
-# y_consider: for multi-class scenario
-def fastweighted_knn_shapley_single(x_train_few, y_train_few, x_test, y_test, K, eps=0, dis_metric='cosine', kernel='rbf', 
-                                    y_consider=None, debug=True):
+def prepare_weights(x_train_few, y_train_few, x_test, y_test, 
+                    dis_metric='cosine', kernel='rbf', y_consider=None):
 
-  N = len(y_train_few)
-  sv = np.zeros(N)
   C = max(y_train_few)+1
-
-  # Currently only work for K>1
-  assert K > 1
 
   # Compute distance
   distance = compute_dist(x_train_few, x_test, dis_metric)
@@ -1834,6 +1826,15 @@ def fastweighted_knn_shapley_single(x_train_few, y_train_few, x_test, y_test, K,
     weight = weight * ( 2*(y_train_few==y_test)-1 )
   else:
     weight = adjust_weights(weight, y_train_few, y_test, y_consider)
+
+  return weight, distance
+
+
+# eps: precision
+def fastweighted_knn_shapley_single(weight, distance, K, eps=0, debug=True):
+
+  N = len(distance)
+  sv = np.zeros(N)
 
   if debug: print('weight={}'.format(weight))
 
@@ -2079,6 +2080,9 @@ def fastweighted_knn_shapley_single(x_train_few, y_train_few, x_test, y_test, K,
 def fastweighted_knn_shapley(x_train_few, y_train_few, x_val_few, y_val_few, K, 
                              eps, dis_metric='cosine', kernel='rbf', debug=True):
   
+  # Currently only work for K>1
+  assert K > 1
+
   N = len(y_train_few)
   sv = np.zeros(N)
 
@@ -2094,15 +2098,14 @@ def fastweighted_knn_shapley(x_train_few, y_train_few, x_val_few, y_val_few, K,
     x_test, y_test = x_val_few[i], y_val_few[i]
 
     if C==2:
-      sv_i = fastweighted_knn_shapley_single(x_train_few, y_train_few, x_test, y_test, K, eps, dis_metric, kernel, debug)
+      weight, distance = prepare_weights(x_train_few, y_train_few, x_test, y_test, dis_metric, kernel, y_consider=None)
+      sv_i = fastweighted_knn_shapley_single(weight, distance, K, eps, debug)
     else:
       sv_i = np.zeros(N)
       classes_to_enumerate = distinct_classes[distinct_classes != y_test]
       for c in classes_to_enumerate:
-        sv_i += fastweighted_knn_shapley_single(
-          x_train_few, y_train_few, x_test, y_test, K, 
-          eps=eps, dis_metric=dis_metric, kernel=kernel, debug=debug, y_consider=c
-        )
+        weight, distance = prepare_weights(x_train_few, y_train_few, x_test, y_test, dis_metric, kernel, y_consider=c)
+        sv_i += fastweighted_knn_shapley_single(weight, distance, K, eps=eps, debug=debug)
         
     sv += sv_i
 
