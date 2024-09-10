@@ -13,3 +13,4 @@ wandb
 *npy
 run_knnlm.py
 check_runtime_baseline.py
+scripts
