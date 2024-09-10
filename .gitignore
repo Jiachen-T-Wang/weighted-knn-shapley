@@ -3,3 +3,13 @@ wtnn_result
 MNIST
 cifar-10-batches-py
 cifar-10-python.tar.gz
+knn-transformers
+knnlm_result
+runtime_result
+tmp_trainer
+wandb
+*.sh
+*.txt
+*npy
+run_knnlm.py
+check_runtime_baseline.py

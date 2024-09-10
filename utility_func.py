@@ -5,10 +5,10 @@ from torch.autograd import Variable
 import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader, TensorDataset
 
-import torchvision.datasets as datasets
-import torchvision
-import torchvision.transforms as transforms
-from torchvision import models
+# import torchvision.datasets as datasets
+# import torchvision
+# import torchvision.transforms as transforms
+# from torchvision import models
 
 # general
 import pandas as pd 

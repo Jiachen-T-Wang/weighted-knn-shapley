@@ -5,10 +5,13 @@ from torch.autograd import Variable
 import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader, TensorDataset
 from numpy import linalg as LA
-import torchvision.datasets as datasets
-import torchvision
-import torchvision.transforms as transforms
-from datasets import load_dataset
+
+# import torchvision.datasets as datasets
+# import torchvision
+# import torchvision.transforms as transforms
+
+# from datasets import load_dataset
+
 # general
 import pandas as pd 
 import numpy as np 
@@ -134,9 +137,9 @@ def make_balance_sample_multiclass(data, target, n_data):
 
 # If noisy_data=False => Flip Label
 # If noisy_data=True => Add Gaussian Noise
-def get_processed_data(dataset, n_data, n_val, flip_ratio, minor_ratio=0.5, noisy_data=False, dim=10, normalize=True):
+def get_processed_data(dataset, n_data, n_val, flip_ratio, minor_ratio=0.5, noisy_data=False, normalize=True, random_seed=999):
     
-    np.random.seed(999)
+    np.random.seed(random_seed)
     
     print('-------')
     print('Load Dataset {}'.format(dataset))
@@ -185,6 +188,7 @@ def get_processed_data(dataset, n_data, n_val, flip_ratio, minor_ratio=0.5, nois
         path ='/home/yq/neural_collapse/features/'
         train_feature = np.load(path + 'vit_cifar_train.npy')
         test_feature = np.load(path + 'vit_cifar_test.npy')
+
         train_mean = np.mean(train_feature, axis=0)
         #print(f'train_mean is {train_mean}')
         train_var = np.var(train_feature, axis=0)
@@ -207,8 +211,10 @@ def get_processed_data(dataset, n_data, n_val, flip_ratio, minor_ratio=0.5, nois
         x_train, y_train = make_balance_sample_multiclass(train_feature_norm, train_labels, n_data)
         x_val, y_val = make_balance_sample_multiclass(test_feature_norm, test_labels, n_val)
 
+
     elif dataset == 'Gaussian':
 
+        dim = 2
         mean = np.zeros(dim)  # Set the mean of the Gaussian distribution
         stddev = np.ones(dim) # Set the standard deviation of the Gaussian distribution
 
@@ -218,6 +224,25 @@ def get_processed_data(dataset, n_data, n_val, flip_ratio, minor_ratio=0.5, nois
 
         x_train, y_train = data[:n_data], labels[:n_data]
         x_val, y_val = data[n_data:], labels[n_data:]
+
+
+    elif dataset == 'Gaussian-shift':
+
+        dim = 2
+
+        mean = np.zeros(dim)
+        mean[0], mean[1] = 1, -1
+        stddev = np.ones(dim)
+        x_train = np.random.normal(mean, stddev, (n_data, dim))
+        feature_sum = np.sum(x_train, axis=1)
+        y_train = np.where(feature_sum > 0, 1, 0)
+
+        mean = np.zeros(dim)  
+        stddev = np.ones(dim) 
+        x_val = np.random.normal(mean, stddev, (n_val, dim))
+        feature_sum = np.sum(x_val, axis=1)
+        y_val = np.where(feature_sum > 0, 1, 0)
+
 
     elif dataset == 'MNIST':
         x_train, y_train, x_test, y_test = get_data(dataset)
@@ -267,6 +292,70 @@ def get_processed_data(dataset, n_data, n_val, flip_ratio, minor_ratio=0.5, nois
         x_val, y_val = x_train[:n_val], y_train[:n_val]
         x_train, y_train = x_train[n_val:n_val+n_data], y_train[n_val:n_val+n_data]
 
+    elif dataset == 'agnews':
+
+        path = '/scratch/gpfs/tw8948/nlp_process/'
+        train_feature = np.load(path + 'agnews_all-roberta-large-v1_train.npy')
+        test_feature = np.load(path + 'agnews_all-roberta-large-v1_test.npy')
+
+        train_mean = np.mean(train_feature, axis=0)
+        train_var = np.var(train_feature, axis=0)
+        test_mean = np.mean(test_feature, axis=0)
+        test_var = np.var(test_feature, axis=0)
+        train_feature_center = (train_feature - train_mean) / np.sqrt(train_var + 1e-5)
+        test_feature_center = (test_feature - train_mean) / np.sqrt(train_var + 1e-5)
+        train_l2_norm = LA.norm(train_feature_center, axis=1)
+        test_l2_norm = LA.norm(test_feature_center, axis=1)
+        train_feature_norm = train_feature_center / train_l2_norm[:, np.newaxis]
+        test_feature_norm = test_feature_center / test_l2_norm[:, np.newaxis]
+        print(f'test the first feature norm is {LA.norm(train_feature_norm[0,:])}')
+
+        # train_feature_norm, test_feature_norm = train_feature, test_feature
+        print(train_feature_norm.shape, test_feature_norm.shape)
+
+        dataset = load_dataset("ag_news")
+        y_train = np.array( dataset['train']['label'] )
+        y_test = np.array( dataset['test']['label'] )
+
+        x_train, y_train = make_balance_sample_multiclass(train_feature_norm, y_train, n_data)
+        x_val, y_val = make_balance_sample_multiclass(test_feature_norm, y_test, n_val)
+
+        # x_train, y_train = train_feature_norm[:n_data], y_train[:n_data]
+        # x_val, y_val = test_feature_norm[:n_data], y_test[:n_data]
+
+
+
+    elif dataset == 'dbpedia':
+
+        path = '/scratch/gpfs/tw8948/nlp_process/'
+        train_feature = np.load(path + 'dbpedia_all-roberta-large-v1_train.npy')
+        test_feature = np.load(path + 'dbpedia_all-roberta-large-v1_test.npy')
+
+        train_mean = np.mean(train_feature, axis=0)
+        train_var = np.var(train_feature, axis=0)
+        test_mean = np.mean(test_feature, axis=0)
+        test_var = np.var(test_feature, axis=0)
+        train_feature_center = (train_feature - train_mean) / np.sqrt(train_var + 1e-5)
+        test_feature_center = (test_feature - train_mean) / np.sqrt(train_var + 1e-5)
+        train_l2_norm = LA.norm(train_feature_center, axis=1)
+        test_l2_norm = LA.norm(test_feature_center, axis=1)
+        train_feature_norm = train_feature_center / train_l2_norm[:, np.newaxis]
+        test_feature_norm = test_feature_center / test_l2_norm[:, np.newaxis]
+        print(f'test the first feature norm is {LA.norm(train_feature_norm[0,:])}')
+
+        dataset = load_dataset("dbpedia_14")
+        y_train = np.array( dataset['train']['label'] )
+        y_test = np.array( dataset['test']['label'] )
+
+        print(train_feature_norm.shape, test_feature_norm.shape)
+
+        x_train, y_train = make_balance_sample_multiclass(train_feature_norm, y_train, n_data)
+        x_val, y_val = make_balance_sample_multiclass(test_feature_norm, y_test, n_val)
+
+        # x_train, y_train = train_feature_norm[:n_data], y_train[:n_data]
+        # x_val, y_val = test_feature_norm[:n_data], y_test[:n_data]
+
+
 
     assert len(y_train.shape)==1
     n_class = len(np.unique(y_train))
@@ -276,7 +365,22 @@ def get_processed_data(dataset, n_data, n_val, flip_ratio, minor_ratio=0.5, nois
     if noisy_data:
         print('Data Error Type: Noisy Feature')
         print('-------')
-        # x_train[:n_flip] += np.random.normal(loc=0.0, scale=100.0, size=(n_flip, x_train.shape[1]))
+
+        if dataset in ['MNIST', 'CIFAR10_CLIP', 'CIFAR10_ImageNet', 'CIFAR10_CIFAR10']:
+            train_feature, test_feature = x_train, x_val
+            train_mean = np.mean(train_feature, axis=0)
+            train_var = np.var(train_feature, axis=0)
+            train_feature_center = (train_feature - train_mean) / np.sqrt(train_var + 1e-5)
+            test_feature_center = (test_feature - train_mean) / np.sqrt(train_var + 1e-5)
+            train_l2_norm = LA.norm(train_feature_center, axis=1)
+            test_l2_norm = LA.norm(test_feature_center, axis=1)
+            x_train = train_feature_center / train_l2_norm[:, np.newaxis]
+            x_val = test_feature_center / test_l2_norm[:, np.newaxis]
+
+            train_l2_norm = LA.norm(train_feature_center, axis=0)
+            # Add noise
+            x_train[:n_flip] += np.random.normal( loc=0.0, scale=np.tile(train_l2_norm*1, (n_flip, 1)) )
+
     else:
         print('Data Error Type: Mislabel')
         print('-------')

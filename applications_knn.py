@@ -1,22 +1,9 @@
-import torch
-import torch.nn as nn
-import torch.optim as optim
-from torch.autograd import Variable
-import torch.nn.functional as F
-from torch.utils.data import Dataset, DataLoader, TensorDataset
-
-import torchvision.datasets as datasets
-import torchvision
-import torchvision.transforms as transforms
-
 # general
-import pandas as pd 
 import numpy as np 
 import copy
 import pickle
-import sys
+import sys, os
 import time
-import os
 import random
 import pdb
 
@@ -24,14 +11,21 @@ from helper import *
 from helper_knn import *
 from utility_func import *
 from prepare_data import *
-from if_utils import *
 import config
 
+# python applications_knn.py --task noisy_detect --dataset click --value_type fastWKNN-SV --n_data 50 --n_val 50 --flip_ratio 0.1 --K 5 --kernel rbf --dis_metric l2 --eps 0 --n_repeat 1 --n_bits 3 --temp 0.1
 
-# python applications_knn.py --task mislabel_detect --dataset creditcard --value_type KNN-SV-JW --n_data 2000 --n_val 2000 --flip_ratio 0.1 --K 5
+# python applications_knn.py --task mislabel_detect --dataset fraud --value_type WKNNSV_RJ --n_data 50 --n_val 1 --flip_ratio 0.1 --K 2 --kernel rbf --dis_metric l2 --n_repeat 1
 
-# python applications_knn.py --task mislabel_detect --dataset creditcard --value_type WTNN-SV --n_data 200 --n_val 10 --flip_ratio 0.1 --tau -0.5
-# python applications_knn.py --task mislabel_detect --dataset creditcard --value_type WKNN-SV --n_data 200 --n_val 10 --flip_ratio 0.1 --K 5
+# python applications_knn.py --task collect_sv --dataset Gaussian --value_type fastWKNN-SV --n_data 50 --n_val 10 --flip_ratio 0.1 --K 5 --kernel rbf --dis_metric l2 --eps 0 --n_repeat 1 --n_bits 3 --temp 0.13
+
+# python applications_knn.py --task collect_sv --dataset Gaussian --value_type KNN-SV-RJ --n_data 50 --n_val 10 --flip_ratio 0.1 --K 5 --kernel rbf --dis_metric l2 --eps 0 --n_repeat 1 --n_bits 3 --temp 0.1
+
+# python applications_knn.py --task mislabel_detect --dataset Gaussian --value_type KNN-SV-RJ --n_data 50 --n_val 10 --flip_ratio 0.1 --K 5 --kernel plain --dis_metric l2 --eps 0 --n_repeat 1 --debug --n_bits 3
+
+# python applications_knn.py --task mislabel_detect --dataset fraud --value_type fastWKNN-SV --n_data 50 --n_val 10 --flip_ratio 0.1 --K 5 --kernel plain --dis_metric l2 --eps 0 --n_repeat 1 --debug --n_bits 3
+
+# python applications_knn.py --task collect_sv --dataset 2dplanes --value_type fastWKNN-SV --n_data 70 --n_val 1 --flip_ratio 0 --K 55 --kernel plain --dis_metric l2 --eps 0 --n_repeat 1 --n_bits 5
 
 
 import argparse
@@ -58,6 +52,10 @@ parser.add_argument('--normalize', action='store_true')
 parser.add_argument('--normalizerow', action='store_true')
 
 parser.add_argument('--kernel', type=str, default='plain') # uniform
+parser.add_argument('--n_bits', type=int, default=3)
+parser.add_argument('--temp', type=float, default=1.0)
+parser.add_argument('--dataset_seed', type=int, default=999)
+
 
 # No use for this project
 parser.add_argument('--model_type', type=str, default='')
@@ -101,6 +99,8 @@ dis_metric = args.dis_metric
 big_dataset = config.big_dataset
 OpenML_dataset = config.OpenML_dataset
 
+dataset_seed = args.dataset_seed
+
 save_dir = 'wtnn_result/'
 
 verbose = 0
@@ -113,10 +113,10 @@ batch_size = 32
 #   u_func = get_ufunc(dataset, model_type, batch_size, lr, verbose)
 
 
-if task in ['mislabel_detect', 'collect_sv', 'select_for_weightedknn']:
-  x_train, y_train, x_val, y_val = get_processed_data(dataset, n_data, n_val, flip_ratio, noisy_data=False, normalize=args.normalize)
+if task in ['mislabel_detect', 'collect_sv', 'select_for_weightedknn', 'check_runtime']:
+  x_train, y_train, x_val, y_val = get_processed_data(dataset, n_data, n_val, flip_ratio, noisy_data=False, normalize=args.normalize, random_seed=dataset_seed)
 elif task=='noisy_detect':
-  x_train, y_train, x_val, y_val = get_processed_data(dataset, n_data, n_val, flip_ratio, noisy_data=True)
+  x_train, y_train, x_val, y_val = get_processed_data(dataset, n_data, n_val, flip_ratio, noisy_data=True, random_seed=dataset_seed)
 
 print('Data Loaded; Shape={} {} {} {}'.format(
   x_train.shape, y_train.shape, x_val.shape, y_val.shape
@@ -153,7 +153,7 @@ print('acc_TNN={}'.format(get_tnn_acc(x_train, y_train, x_val, y_val, tau=-0.5, 
 
 knn_val_collection = ['KNN-SV', 'KNN-SV-RJ', 'KNN-SV-JW', 'TNN-BZ', 'TNN-BZ-private', 'TNN-SV', 
                       'TNN-SV-private', 'KNN-SV-RJ-private', 'KNN-SV-RJ-private-withsub', 'KNN-BZ-private-fixeps', 
-                      'TNN-SV-private-JDP', 'WTNN-SV', 'fastWTNN-SV', 'WKNN-SV', 'fastWKNN-SV', 'approxfastWKNN-SV', 
+                      'TNN-SV-private-JDP', 'WTNN-SV', 'WKNNSV_RJ', 'WKNNSV_MC_RJ', 'fastWTNN-SV', 'WKNN-SV', 'fastWKNN-SV', 'approxfastWKNN-SV', 
                       'fastWKNN-SV-old', 'fastWKNN-SV-cache']
 
 
@@ -233,6 +233,31 @@ for i in range(n_repeat):
       v_args['y_feature'] = value_args['y_feature'][:, i, -1]
 
 
+  if task == 'collect_sv':
+
+    start = time.time()
+
+    if value_type == 'KNN-SV-RJ':
+      sv, sv_lst = knn_shapley_RJ(x_train, y_train, x_val, y_val, K=K, dis_metric=dis_metric, collect_sv=True)
+    elif value_type == 'fastWKNN-SV':
+      sv, sv_lst = fastweighted_knn_shapley(x_train, y_train, x_val, y_val, eps=args.eps, K=K, dis_metric=dis_metric, 
+                                            kernel=args.kernel, debug=args.debug, n_bits=args.n_bits, collect_sv=True, 
+                                            temp=args.temp)
+      
+    print('Data Value Computed; Value Name: {}; Runtime: {} s'.format( value_type, np.round(time.time()-start, 3) ))
+    sv_per_test_data = np.array(sv_lst)
+    print(sv_per_test_data.shape)
+    print(sv_per_test_data)
+
+    sys.exit(0)
+
+    # file_name = '{}_{}_{}_{}_{}_FR{}_EPS{}_NB{}_K{}_{}.result'.format(
+    #   args.value_type, args.dataset, args.value_type, args.n_data, args.n_val, args.flip_ratio, args.eps, args.n_bits, args.K, dis_metric
+    # )
+    # pickle.dump( sv_lst, open(save_dir + file_name, 'wb') )
+    # sys.exit(0)
+
+
   start = time.time()
 
   if value_type == 'inf':
@@ -253,10 +278,14 @@ for i in range(n_repeat):
     sv = weighted_tknn_shapley(x_train, y_train, x_val, y_val, tau=tau, dis_metric=dis_metric, kernel=args.kernel, debug=args.debug)
   elif value_type == 'fastWTNN-SV':
     sv = fastweighted_tknn_shapley(x_train, y_train, x_val, y_val, tau=tau, dis_metric=dis_metric, kernel=args.kernel, debug=args.debug)
+  elif value_type == 'WKNNSV_RJ':
+    sv = WKNNSV_RJ(x_train, y_train, x_val, y_val, K=K, dis_metric=dis_metric, kernel=args.kernel, mode='softlabel')  
+  elif value_type == 'WKNNSV_MC_RJ':
+    sv = WKNNSV_MC_RJ(x_train, y_train, x_val, y_val, K=K, dis_metric=dis_metric, kernel=args.kernel, mode='softlabel', n_sample=n_data*10)
   elif value_type == 'WKNN-SV':
     sv = weighted_knn_shapley(x_train, y_train, x_val, y_val, K=K, dis_metric=dis_metric, kernel=args.kernel, debug=args.debug)
   elif value_type == 'fastWKNN-SV':
-    sv = fastweighted_knn_shapley(x_train, y_train, x_val, y_val, eps=args.eps, K=K, dis_metric=dis_metric, kernel=args.kernel, debug=args.debug)
+    sv = fastweighted_knn_shapley(x_train, y_train, x_val, y_val, eps=args.eps, K=K, dis_metric=dis_metric, kernel=args.kernel, debug=args.debug, n_bits=args.n_bits, temp=args.temp)
   elif value_type == 'fastWKNN-SV-old':
     sv = fastweighted_knn_shapley_old(x_train, y_train, x_val, y_val, K=K, dis_metric=dis_metric, kernel=args.kernel, debug=args.debug)
   elif value_type == 'approxfastWKNN-SV':
@@ -275,6 +304,8 @@ for i in range(n_repeat):
   else:
     print('Data Value Computed; Value Name: {}; Runtime: {} s'.format( value_type, np.round(time.time()-start, 3) ))
 
+  if task == 'check_runtime':
+    sys.exit(0)
 
   if task=='weighted_acc':
 
@@ -385,6 +416,9 @@ elif task == 'data_add':
 
 elif task == 'collect_sv':
 
-  file_name = 'SV_{}_{}_{}_{}_{}.result'.format(args.dataset, args.value_type, args.n_data, args.n_val, args.eps)
-  pickle.dump( sv_collect, open(save_dir + file_name, 'wb') )
+  file_name = '{}_{}_{}_{}_{}_FR{}_EPS{}_NB{}_K{}.result'.format(
+    args.value_type, args.dataset, args.value_type, args.n_data, args.n_val, args.flip_ratio, args.eps, args.n_bits, args.K
+  )
+  print(sv_collect)
+  # pickle.dump( sv_collect, open(save_dir + file_name, 'wb') )
 
